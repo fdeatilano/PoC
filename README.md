@@ -1,4 +1,4 @@
-CrudPoC
+PoC
 =======
 
-Proof of concept of a CRUD app minimizing the use of third part libraries
+Proofs of concept developed as open source.
