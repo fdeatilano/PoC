@@ -20,10 +20,20 @@ public class DbConstants {
 	
 	public static final String CHECKINS_TABLE = "checkins";
 	public static enum CheckinsFields{
-		ID(DB_IDENTIFIER_FIELD),USER_ID("user_id"),CHECK_TIME("check_time"),LONGITUDE("longitude"),LATITUDE("latitude"),DEVICE("device");
+		ID(DB_IDENTIFIER_FIELD),USER_ID("user_id"),PLACE_ID("place_id"),CHECK_TIME("check_time"),LONGITUDE("longitude"),LATITUDE("latitude"),DEVICE("device");
 	
 		private String name;
 		CheckinsFields(String name){
+			this.name=name;
+		}
+	};
+	
+	public static final String PLACES_TABLE = "places";
+	public static enum PlacesFields{
+		ID(DB_IDENTIFIER_FIELD),LONGITUDE("longitude"),LATITUDE("latitude"),ADDRESS("address");
+	
+		private String name;
+		PlacesFields(String name){
 			this.name=name;
 		}
 	};

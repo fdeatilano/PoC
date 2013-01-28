@@ -205,6 +205,9 @@ public class PersistenceManager {
 					prepStmUpdate.setString(++paramIndex, (String)value);
 				}
 			}
+			if(entity.getId()==null){
+				throw new UnableToUpdateEntityException();
+			}
 			prepStmUpdate.setInt(++paramIndex, entity.getId());
 			if(prepStmUpdate.executeUpdate()!=1){
 				throw new UnableToUpdateEntityException();
@@ -223,7 +226,7 @@ public class PersistenceManager {
 	 * Delete the register from database which has the same id provided in the parameter entity
 	 * 
 	 * @param entityClass
-	 * @param identifier TODO
+	 * @param identifier
 	 * @throws UnableToDeleteEntityException
 	 */
 	public void delete(Class<?> entityClass, Integer identifier) throws UnableToDeleteEntityException {

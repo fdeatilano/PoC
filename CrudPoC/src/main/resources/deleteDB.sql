@@ -1,3 +1,5 @@
 ALTER TABLE checkins DROP CONSTRAINT users_id_fk; 
 DROP TABLE users IF EXISTS;
+ALTER TABLE checkins DROP CONSTRAINT places_id_fk; 
+DROP TABLE places IF EXISTS;
 DROP TABLE checkins IF EXISTS;

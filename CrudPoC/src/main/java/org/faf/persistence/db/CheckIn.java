@@ -11,6 +11,7 @@ public class CheckIn implements PersistenceEntity{
 
 	private Integer id;
 	private User user;
+	private Place place;
 	private Timestamp checkTime;
 	private String device;
 	private Double longitude;
@@ -18,8 +19,9 @@ public class CheckIn implements PersistenceEntity{
 
 	public CheckIn(){}
 	
-	public CheckIn(User user, Double longitude, Double latitude, String device) {
+	public CheckIn(User user, Place place, Double longitude, Double latitude, String device) {
 		this.user=user;
+		this.place=place;
 		this.longitude=longitude;
 		this.latitude=latitude;
 		this.device=device;
@@ -29,8 +31,8 @@ public class CheckIn implements PersistenceEntity{
 		return this.id;
 	}
 
-	public Integer getUserId() {
-		return this.user.getId();
+	public User getUser() {
+		return this.user;
 	}
 
 	public Double getLongitude() {
@@ -44,10 +46,9 @@ public class CheckIn implements PersistenceEntity{
 	public String getDevice() {
 		return this.device;
 	}
-	
 
-	public void setUserId(Integer userId) {
-		this.user.setId(userId);
+	public void setUser(User user) {
+		this.user=user;
 	}
 
 	public void setDevice(String device) {
@@ -69,6 +70,14 @@ public class CheckIn implements PersistenceEntity{
 	public Timestamp getCheckTime() {
 		return checkTime;
 	}
+	
+	public Place getPlace() {
+		return place;
+	}
+
+	public void setPlace(Place place) {
+		this.place = place;
+	}
 
 	@Override
 	public String getTableName() {
@@ -78,7 +87,8 @@ public class CheckIn implements PersistenceEntity{
 	@Override
 	public LinkedHashMap<String, Object> getFieldsAndValues() {
 		LinkedHashMap<String, Object> fieldsValues = new LinkedHashMap<String,Object>();
-		fieldsValues.put(CheckinsFields.USER_ID.name(), user.getId());
+		fieldsValues.put(CheckinsFields.USER_ID.name(), (user==null)?null:user.getId());
+		fieldsValues.put(CheckinsFields.PLACE_ID.name(), (place==null)?null:place.getId());
 		fieldsValues.put(CheckinsFields.LONGITUDE.name(), longitude);
 		fieldsValues.put(CheckinsFields.LATITUDE.name(), latitude);
 		fieldsValues.put(CheckinsFields.DEVICE.name(), device);
@@ -95,7 +105,12 @@ public class CheckIn implements PersistenceEntity{
 					user=new User();
 				}
 				user.setId((Integer)values.get(field));
-			} else if(field.equals(CheckinsFields.CHECK_TIME.name())){
+			} else if(field.equals(CheckinsFields.PLACE_ID.name())){
+				if(place==null){
+					place=new Place();
+				}
+				place.setId((Integer)values.get(field));
+			}else if(field.equals(CheckinsFields.CHECK_TIME.name())){
 				checkTime=(Timestamp)values.get(field);
 			} else if(field.equals(CheckinsFields.LONGITUDE.name())){
 				longitude=(Double)values.get(field);
@@ -112,6 +127,7 @@ public class CheckIn implements PersistenceEntity{
 		LinkedHashMap<String, Class<?>> fieldsTypes = new LinkedHashMap<String,Class<?>>();
 		fieldsTypes.put(CheckinsFields.ID.name(), Integer.class);
 		fieldsTypes.put(CheckinsFields.USER_ID.name(), Integer.class);
+		fieldsTypes.put(CheckinsFields.PLACE_ID.name(), Integer.class);
 		fieldsTypes.put(CheckinsFields.CHECK_TIME.name(), Timestamp.class);
 		fieldsTypes.put(CheckinsFields.LONGITUDE.name(), Double.class);
 		fieldsTypes.put(CheckinsFields.LATITUDE.name(), Double.class);
@@ -131,6 +147,7 @@ public class CheckIn implements PersistenceEntity{
 				+ ((latitude == null) ? 0 : latitude.hashCode());
 		result = prime * result
 				+ ((longitude == null) ? 0 : longitude.hashCode());
+		result = prime * result + ((place == null) ? 0 : place.hashCode());
 		result = prime * result + ((user == null) ? 0 : user.hashCode());
 		return result;
 	}
@@ -169,6 +186,11 @@ public class CheckIn implements PersistenceEntity{
 				return false;
 		} else if (!longitude.equals(other.longitude))
 			return false;
+		if (place == null) {
+			if (other.place != null)
+				return false;
+		} else if (!place.getId().equals(other.place.getId()))
+			return false;
 		if (user == null) {
 			if (other.user != null)
 				return false;
@@ -176,5 +198,7 @@ public class CheckIn implements PersistenceEntity{
 			return false;
 		return true;
 	}
+
+	
 
 }

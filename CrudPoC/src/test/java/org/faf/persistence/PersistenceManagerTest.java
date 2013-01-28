@@ -4,7 +4,12 @@ package org.faf.persistence;
 import java.sql.SQLException;
 
 import org.faf.persistence.db.CheckIn;
+import org.faf.persistence.db.Place;
 import org.faf.persistence.db.User;
+import org.faf.persistence.db.exceptions.UnableToCreateEntityException;
+import org.faf.persistence.db.exceptions.UnableToDeleteEntityException;
+import org.faf.persistence.db.exceptions.UnableToRetrieveEntityException;
+import org.faf.persistence.db.exceptions.UnableToUpdateEntityException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -20,20 +25,39 @@ public class PersistenceManagerTest {
 		_pm.initializeDB();
 	}
 	
+	@Test(expected=UnableToCreateEntityException.class)
+	public void testCreateWithNullId() throws Exception {
+		_pm.create(new User());
+	}
+	
 	@Test
 	public void testCreateUser() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login",null);
 		_pm.create(user);
 		Assert.assertEquals(new Integer(1), user.getId());
 	}
 	
 	@Test
+	public void testCreatePlace() throws Exception {
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		Assert.assertEquals(new Integer(1), place.getId());
+	}
+	
+	@Test
 	public void testCreateCheckIn() throws Exception {
-		User user = new User("login","password");
+		User user = new User(null,"password");
 		_pm.create(user);
-		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		CheckIn checkIn = new CheckIn(user,place,1.0,2.0,"Mobile");
 		_pm.create(checkIn);
 		Assert.assertEquals(new Integer(1), checkIn.getId());
+	}
+	
+	@Test(expected=UnableToRetrieveEntityException.class)
+	public void testReadWithNullId() throws Exception {
+		_pm.read(User.class,null);
 	}
 		
 	@Test
@@ -45,13 +69,28 @@ public class PersistenceManagerTest {
 	}
 	
 	@Test
+	public void testReadPlace() throws Exception {
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		Place storedPlace = (Place)_pm.read(Place.class, place.getId());
+		Assert.assertEquals(place,storedPlace);
+	}
+	
+	@Test
 	public void testReadCheckIn() throws Exception {
 		User user = new User("login","password");
 		_pm.create(user);
-		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		CheckIn checkIn = new CheckIn(user,place,1.0,2.0,"Mobile");
 		checkIn = (CheckIn)_pm.create(checkIn);
 		CheckIn storedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,storedCheckIn);
+	}
+	
+	@Test(expected=UnableToUpdateEntityException.class)
+	public void testUpdateWithNullId() throws Exception {
+		_pm.update(new User());
 	}
 	
 	@Test
@@ -66,10 +105,24 @@ public class PersistenceManagerTest {
 	}
 	
 	@Test
+	public void testUpdatePlace() throws Exception {
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		place.setLatitude(3.0);
+		place.setLongitude(10.0);
+		place.setAddress("updatedAddress");
+		_pm.update(place);
+		Place updatedPlace = (Place)_pm.read(Place.class, place.getId());
+		Assert.assertEquals(place,updatedPlace);
+	}
+	
+	@Test
 	public void testUpdateCheckin() throws Exception {
 		User user = new User("login","password");
 		_pm.create(user);
-		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		CheckIn checkIn = new CheckIn(user,place,1.0,2.0,"Mobile");
 		checkIn = (CheckIn)_pm.create(checkIn);
 		checkIn.setLatitude(4.0);
 		checkIn.setLongitude(6.0);
@@ -77,6 +130,11 @@ public class PersistenceManagerTest {
 		_pm.update(checkIn);
 		CheckIn updatedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,updatedCheckIn);
+	}
+	
+	@Test(expected=UnableToDeleteEntityException.class)
+	public void testDeleteWithNullId() throws Exception {
+		_pm.delete(User.class, null);
 	}
 	
 	@Test
@@ -91,10 +149,23 @@ public class PersistenceManagerTest {
 	}
 	
 	@Test
+	public void testDeletePlace() throws Exception {
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		Place storedPlace = (Place)_pm.read(Place.class, place.getId());
+		Assert.assertEquals(place,storedPlace);
+		_pm.delete(Place.class, place.getId());
+		storedPlace = (Place)_pm.read(Place.class, place.getId());
+		Assert.assertEquals(null,storedPlace);
+	}
+	
+	@Test
 	public void testDeleteCheckIn() throws Exception {
 		User user = new User("login","password");
 		_pm.create(user);
-		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
+		Place place = new Place(1.0,2.0,"address");
+		_pm.create(place);
+		CheckIn checkIn = new CheckIn(user,place,1.0,2.0,"Mobile");
 		checkIn = (CheckIn)_pm.create(checkIn);
 		CheckIn storedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,storedCheckIn);
