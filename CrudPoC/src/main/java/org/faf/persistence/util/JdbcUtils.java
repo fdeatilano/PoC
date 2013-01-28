@@ -1,8 +1,8 @@
 package org.faf.persistence.util;
 
-import static org.faf.persistence.util.DbConstants.DB_PASSWORD;
-import static org.faf.persistence.util.DbConstants.DB_URI;
-import static org.faf.persistence.util.DbConstants.DB_USER;
+import static org.faf.persistence.config.DbConfiguration.DB_PASSWORD;
+import static org.faf.persistence.config.DbConfiguration.DB_URI;
+import static org.faf.persistence.config.DbConfiguration.DB_USER;
 
 import java.io.IOException;
 import java.io.InputStreamReader;

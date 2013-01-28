@@ -3,13 +3,13 @@ package org.faf.persistence;
 
 import java.sql.SQLException;
 
-import org.faf.persistence.db.CheckIn;
-import org.faf.persistence.db.Place;
-import org.faf.persistence.db.User;
-import org.faf.persistence.db.exceptions.UnableToCreateEntityException;
-import org.faf.persistence.db.exceptions.UnableToDeleteEntityException;
-import org.faf.persistence.db.exceptions.UnableToRetrieveEntityException;
-import org.faf.persistence.db.exceptions.UnableToUpdateEntityException;
+import org.faf.persistence.entities.CheckIn;
+import org.faf.persistence.entities.Place;
+import org.faf.persistence.entities.User;
+import org.faf.persistence.exceptions.UnableToCreateEntityException;
+import org.faf.persistence.exceptions.UnableToDeleteEntityException;
+import org.faf.persistence.exceptions.UnableToRetrieveEntityException;
+import org.faf.persistence.exceptions.UnableToUpdateEntityException;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;

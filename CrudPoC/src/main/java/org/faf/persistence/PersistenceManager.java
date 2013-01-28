@@ -1,10 +1,10 @@
 package org.faf.persistence;
 
-import static org.faf.persistence.util.DbConstants.DB_IDENTIFIER_FIELD;
-import static org.faf.persistence.util.DbConstants.DB_PASSWORD;
-import static org.faf.persistence.util.DbConstants.DB_URI;
-import static org.faf.persistence.util.DbConstants.DB_USER;
-import static org.faf.persistence.util.DbConstants.INITIAL_PARAM_INDEX;
+import static org.faf.persistence.config.DbConfiguration.DB_IDENTIFIER_FIELD;
+import static org.faf.persistence.config.DbConfiguration.DB_PASSWORD;
+import static org.faf.persistence.config.DbConfiguration.DB_URI;
+import static org.faf.persistence.config.DbConfiguration.DB_USER;
+import static org.faf.persistence.config.DbConfiguration.INITIAL_PARAM_INDEX;
 import static org.faf.persistence.util.JdbcUtils.executeScript;
 
 import java.sql.Connection;
@@ -19,11 +19,11 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.faf.persistence.db.exceptions.UnableToCreateEntityException;
-import org.faf.persistence.db.exceptions.UnableToDeleteEntityException;
-import org.faf.persistence.db.exceptions.UnableToRetrieveEntityException;
-import org.faf.persistence.db.exceptions.UnableToRetrieveIdException;
-import org.faf.persistence.db.exceptions.UnableToUpdateEntityException;
+import org.faf.persistence.exceptions.UnableToCreateEntityException;
+import org.faf.persistence.exceptions.UnableToDeleteEntityException;
+import org.faf.persistence.exceptions.UnableToRetrieveEntityException;
+import org.faf.persistence.exceptions.UnableToRetrieveIdException;
+import org.faf.persistence.exceptions.UnableToUpdateEntityException;
 
 public class PersistenceManager {
 
