@@ -123,6 +123,8 @@ public class CheckIn implements PersistenceEntity{
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result
+				+ ((checkTime == null) ? 0 : checkTime.hashCode());
 		result = prime * result + ((device == null) ? 0 : device.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
@@ -142,6 +144,11 @@ public class CheckIn implements PersistenceEntity{
 		if (getClass() != obj.getClass())
 			return false;
 		CheckIn other = (CheckIn) obj;
+		if (checkTime == null) {
+			if (other.checkTime != null)
+				return false;
+		} else if (!checkTime.equals(other.checkTime))
+			return false;
 		if (device == null) {
 			if (other.device != null)
 				return false;
@@ -169,5 +176,5 @@ public class CheckIn implements PersistenceEntity{
 			return false;
 		return true;
 	}
-	
+
 }

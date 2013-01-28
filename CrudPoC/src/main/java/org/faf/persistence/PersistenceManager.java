@@ -19,7 +19,6 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import org.faf.persistence.db.User;
 import org.faf.persistence.db.exceptions.UnableToCreateEntityException;
 import org.faf.persistence.db.exceptions.UnableToDeleteEntityException;
 import org.faf.persistence.db.exceptions.UnableToRetrieveEntityException;
@@ -88,30 +87,36 @@ public class PersistenceManager {
 			}
 			rsIdentity.close();
 			prepStmIdentity.close();
-			
 			conn.close();
+			
+			entity = read(entity.getClass(),entity.getId());
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new UnableToCreateEntityException();
+			throw new UnableToCreateEntityException(e);
+		} catch (UnableToRetrieveEntityException e) {
+			e.printStackTrace();
+			throw new UnableToCreateEntityException(e);
 		}
 		return entity;
 	}
 
 	/**
-	 * Retrieves from database the entity with the id equals to the one of the entity passed as parameter
+	 * Retrieves from database the entity with the identifier and types provided
 	 * 
-	 * @param entity
+	 * @param entityClass
+	 * @param identifier
 	 * @return
 	 * @throws UnableToRetrieveEntityException
 	 * @throws UnableToRetrieveIdException
 	 */
-	public PersistenceEntity read(PersistenceEntity entity) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
+	public PersistenceEntity read(Class<?> entityClass, Integer identifier) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
 		
 			
-		if(entity.getId()==null){
+		if(identifier==null){
 			throw new UnableToRetrieveEntityException();
 		}else{
 			try {
+				PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
 				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 				
 				String selectQuery = "SELECT ";
@@ -125,7 +130,7 @@ public class PersistenceManager {
 			
 				PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
 				Integer paramIndex = INITIAL_PARAM_INDEX;
-				prepStmSelect.setInt(++paramIndex, entity.getId());
+				prepStmSelect.setInt(++paramIndex, identifier);
 				ResultSet rs = prepStmSelect.executeQuery();
 				LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
 				if(rs.next()){
@@ -149,13 +154,19 @@ public class PersistenceManager {
 					return null;
 				}
 				prepStmSelect.close();
+				return entity;
+				
 			} catch (SQLException e) {
 				e.printStackTrace();
-				throw new UnableToRetrieveEntityException();
+				throw new UnableToRetrieveEntityException(e);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				throw new UnableToRetrieveEntityException(e);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				throw new UnableToRetrieveEntityException(e);
 			}
-			return entity;
-		}
-		
+		}		
 	}
 	
 	/**
@@ -203,7 +214,7 @@ public class PersistenceManager {
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new UnableToUpdateEntityException();
+			throw new UnableToUpdateEntityException(e);
 		}
 		return entity;
 	}
@@ -211,15 +222,16 @@ public class PersistenceManager {
 	/**
 	 * Delete the register from database which has the same id provided in the parameter entity
 	 * 
-	 * @param entity
-	 * @return
+	 * @param entityClass
+	 * @param identifier TODO
 	 * @throws UnableToDeleteEntityException
 	 */
-	public PersistenceEntity delete(PersistenceEntity entity) throws UnableToDeleteEntityException {
-		if(entity.getId()==null){
+	public void delete(Class<?> entityClass, Integer identifier) throws UnableToDeleteEntityException {
+		if(identifier==null){
 			throw new UnableToDeleteEntityException();
 		}else{
 			try {
+				PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
 				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 				
 				String deleteQuery = "DELETE FROM "+entity.getTableName();
@@ -227,7 +239,7 @@ public class PersistenceManager {
 			
 				PreparedStatement prepStmDelete = conn.prepareStatement(deleteQuery);
 				Integer paramIndex = INITIAL_PARAM_INDEX;
-				prepStmDelete.setInt(++paramIndex, entity.getId());
+				prepStmDelete.setInt(++paramIndex, identifier);
 				if(prepStmDelete.executeUpdate()!=1){
 					throw new UnableToDeleteEntityException();
 				}
@@ -235,9 +247,14 @@ public class PersistenceManager {
 				prepStmDelete.close();
 			} catch (SQLException e) {
 				e.printStackTrace();
-				throw new UnableToDeleteEntityException();
+				throw new UnableToDeleteEntityException(e);
+			} catch (InstantiationException e) {
+				e.printStackTrace();
+				throw new UnableToDeleteEntityException(e);
+			} catch (IllegalAccessException e) {
+				e.printStackTrace();
+				throw new UnableToDeleteEntityException(e);
 			}
-			return entity;
 		}
 	}
 	

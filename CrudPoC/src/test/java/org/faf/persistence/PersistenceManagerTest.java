@@ -1,8 +1,6 @@
 package org.faf.persistence;
 
 
-import static org.junit.Assert.*;
-
 import java.sql.SQLException;
 
 import org.faf.persistence.db.CheckIn;
@@ -42,9 +40,7 @@ public class PersistenceManagerTest {
 	public void testReadUser() throws Exception {
 		User user = new User("login","password");
 		_pm.create(user);
-		User searchUser = new User();
-		searchUser.setId(user.getId());
-		User storedUser = (User)_pm.read(searchUser);
+		User storedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(user,storedUser);
 	}
 	
@@ -53,10 +49,8 @@ public class PersistenceManagerTest {
 		User user = new User("login","password");
 		_pm.create(user);
 		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
-		_pm.create(checkIn);
-		CheckIn searchCheckIn = new CheckIn();
-		searchCheckIn.setId(checkIn.getId());
-		CheckIn storedCheckIn = (CheckIn)_pm.read(searchCheckIn);
+		checkIn = (CheckIn)_pm.create(checkIn);
+		CheckIn storedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,storedCheckIn);
 	}
 	
@@ -67,9 +61,7 @@ public class PersistenceManagerTest {
 		user.setLogin("updatedLogin");
 		user.setPassword("updatedPassword");
 		_pm.update(user);
-		User searchUser = new User();
-		searchUser.setId(user.getId());
-		User updatedUser = (User)_pm.read(searchUser);
+		User updatedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(user,updatedUser);
 	}
 	
@@ -78,14 +70,12 @@ public class PersistenceManagerTest {
 		User user = new User("login","password");
 		_pm.create(user);
 		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
-		_pm.create(checkIn);
+		checkIn = (CheckIn)_pm.create(checkIn);
 		checkIn.setLatitude(4.0);
 		checkIn.setLongitude(6.0);
 		checkIn.setDevice("updatedMobile");
 		_pm.update(checkIn);
-		CheckIn searchCheckIn = new CheckIn();
-		searchCheckIn.setId(checkIn.getId());
-		CheckIn updatedCheckIn = (CheckIn)_pm.read(searchCheckIn);
+		CheckIn updatedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,updatedCheckIn);
 	}
 	
@@ -93,12 +83,10 @@ public class PersistenceManagerTest {
 	public void testDeleteUser() throws Exception {
 		User user = new User("login","password");
 		_pm.create(user);
-		User searchUser = new User();
-		searchUser.setId(user.getId());
-		User storedUser = (User)_pm.read(searchUser);
+		User storedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(user,storedUser);
-		_pm.delete(user);
-		storedUser = (User)_pm.read(searchUser);
+		_pm.delete(User.class, user.getId());
+		storedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(null,storedUser);
 	}
 	
@@ -107,13 +95,11 @@ public class PersistenceManagerTest {
 		User user = new User("login","password");
 		_pm.create(user);
 		CheckIn checkIn = new CheckIn(user,1.0,2.0,"Mobile");
-		_pm.create(checkIn);
-		CheckIn searchCheckIn = new CheckIn();
-		searchCheckIn.setId(checkIn.getId());
-		CheckIn storedCheckIn = (CheckIn)_pm.read(searchCheckIn);
+		checkIn = (CheckIn)_pm.create(checkIn);
+		CheckIn storedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(checkIn,storedCheckIn);
-		_pm.delete(checkIn);
-		storedCheckIn = (CheckIn)_pm.read(searchCheckIn);
+		_pm.delete(CheckIn.class, checkIn.getId());
+		storedCheckIn = (CheckIn)_pm.read(CheckIn.class, checkIn.getId());
 		Assert.assertEquals(null,storedCheckIn);
 	}
 }
