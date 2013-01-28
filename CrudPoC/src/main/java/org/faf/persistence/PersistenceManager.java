@@ -13,6 +13,7 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.SQLSyntaxErrorException;
+import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.List;
@@ -47,7 +48,7 @@ public class PersistenceManager {
 			String valuesStr="";
 			List<Object> values = new LinkedList<Object>();
 			for (String field : fieldsValues.keySet()) {
-				if(fieldsValues.get(field)!=null && !field.equalsIgnoreCase(DB_IDENTIFIER_FIELD)){
+				if(fieldsValues.get(field)!=null){
 					insertQuery+=field+",";
 					valuesStr+="?,";
 					values.add(fieldsValues.get(field));
@@ -138,7 +139,10 @@ public class PersistenceManager {
 						}else if(fieldsTypes.get(field).equals(String.class)){
 							String strValue = rs.getString(field);
 							values.put(field, strValue);
-						}
+						}else if(fieldsTypes.get(field).equals(Timestamp.class)){
+							Timestamp timestampValue = rs.getTimestamp(field);
+							values.put(field, timestampValue);
+						}	
 					}
 					entity.setValues(values);
 				}else{
@@ -171,7 +175,7 @@ public class PersistenceManager {
 			Map<String, Object> fieldsValues = entity.getFieldsAndValues();
 			List<Object> values = new LinkedList<Object>();
 			for (String field : fieldsValues.keySet()) {
-				if(!field.equalsIgnoreCase(DB_IDENTIFIER_FIELD) && fieldsValues.get(field)!=null){
+				if(fieldsValues.get(field)!=null){
 					updateQuery+=field+"=?,";
 					values.add(fieldsValues.get(field));
 				}		

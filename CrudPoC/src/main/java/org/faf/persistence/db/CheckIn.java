@@ -78,7 +78,6 @@ public class CheckIn implements PersistenceEntity{
 	@Override
 	public LinkedHashMap<String, Object> getFieldsAndValues() {
 		LinkedHashMap<String, Object> fieldsValues = new LinkedHashMap<String,Object>();
-		fieldsValues.put(CheckinsFields.ID.name(), id);
 		fieldsValues.put(CheckinsFields.USER_ID.name(), user.getId());
 		fieldsValues.put(CheckinsFields.LONGITUDE.name(), longitude);
 		fieldsValues.put(CheckinsFields.LATITUDE.name(), latitude);
@@ -96,6 +95,8 @@ public class CheckIn implements PersistenceEntity{
 					user=new User();
 				}
 				user.setId((Integer)values.get(field));
+			} else if(field.equals(CheckinsFields.CHECK_TIME.name())){
+				checkTime=(Timestamp)values.get(field);
 			} else if(field.equals(CheckinsFields.LONGITUDE.name())){
 				longitude=(Double)values.get(field);
 			} else if(field.equals(CheckinsFields.LATITUDE.name())){
@@ -111,6 +112,7 @@ public class CheckIn implements PersistenceEntity{
 		LinkedHashMap<String, Class<?>> fieldsTypes = new LinkedHashMap<String,Class<?>>();
 		fieldsTypes.put(CheckinsFields.ID.name(), Integer.class);
 		fieldsTypes.put(CheckinsFields.USER_ID.name(), Integer.class);
+		fieldsTypes.put(CheckinsFields.CHECK_TIME.name(), Timestamp.class);
 		fieldsTypes.put(CheckinsFields.LONGITUDE.name(), Double.class);
 		fieldsTypes.put(CheckinsFields.LATITUDE.name(), Double.class);
 		fieldsTypes.put(CheckinsFields.DEVICE.name(), String.class);

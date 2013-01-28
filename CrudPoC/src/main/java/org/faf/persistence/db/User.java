@@ -51,7 +51,6 @@ public class User implements PersistenceEntity{
 	@Override
 	public LinkedHashMap<String, Object> getFieldsAndValues() {
 		LinkedHashMap<String, Object> fieldsValues = new LinkedHashMap<String,Object>();
-		fieldsValues.put(UsersFields.ID.name(), id);
 		fieldsValues.put(UsersFields.LOGIN.name(), login);
 		fieldsValues.put(UsersFields.PASSWORD.name(), password);
 		return fieldsValues;
