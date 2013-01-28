@@ -1,42 +1,75 @@
 package org.faf.persistence;
 
+import static org.faf.persistence.util.DbConstants.DB_IDENTIFIER_FIELD;
+import static org.faf.persistence.util.DbConstants.DB_PASSWORD;
+import static org.faf.persistence.util.DbConstants.DB_URI;
+import static org.faf.persistence.util.DbConstants.DB_USER;
+import static org.faf.persistence.util.DbConstants.INITIAL_PARAM_INDEX;
+import static org.faf.persistence.util.JdbcUtils.executeScript;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.SQLSyntaxErrorException;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
 
-import org.faf.persistence.db.CheckIn;
 import org.faf.persistence.db.User;
-import org.faf.persistence.db.exceptions.UnableToCreateCheckInException;
-import org.faf.persistence.db.exceptions.UnableToRetrieveCheckInException;
+import org.faf.persistence.db.exceptions.UnableToCreateEntityException;
+import org.faf.persistence.db.exceptions.UnableToDeleteEntityException;
+import org.faf.persistence.db.exceptions.UnableToRetrieveEntityException;
 import org.faf.persistence.db.exceptions.UnableToRetrieveIdException;
-import org.faf.persistence.util.Device;
-import org.faf.persistence.util.GeoLocation;
+import org.faf.persistence.db.exceptions.UnableToUpdateEntityException;
 
 public class PersistenceManager {
 
-	private static final String DB_URI = "jdbc:hsqldb:file:/home/francisco/resources/pocDb/CrudPoCDb";
-	private static final String DB_USER = "walkin";
-	private static final String DB_PASSWORD = "walkin";
-	private static final Integer INITIAL_PARAM_INDEX = 0;
 
-	public void create(CheckIn checkIn) throws UnableToCreateCheckInException, UnableToRetrieveIdException {
+	/**
+	 * Inserts into database the given entity
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws UnableToCreateEntityException
+	 * @throws UnableToRetrieveIdException
+	 */
+	public PersistenceEntity create(PersistenceEntity entity) throws UnableToCreateEntityException, UnableToRetrieveIdException {
 		Connection conn;
+		
 		try {
 			conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 			
-			String insertCheckInQuery = "INSERT INTO checkins "
-					+ "(user_id,longitude,latitude,device)" 
-					+ "VALUES (?,?,?,?)";
-			PreparedStatement prepStmInsert = conn.prepareStatement(insertCheckInQuery);
+			String insertQuery = "INSERT INTO " + entity.getTableName() + " (";
+			Map<String, Object> fieldsValues = entity.getFieldsAndValues();
+			String valuesStr="";
+			List<Object> values = new LinkedList<Object>();
+			for (String field : fieldsValues.keySet()) {
+				if(fieldsValues.get(field)!=null && !field.equalsIgnoreCase(DB_IDENTIFIER_FIELD)){
+					insertQuery+=field+",";
+					valuesStr+="?,";
+					values.add(fieldsValues.get(field));
+				}		
+			}
+			insertQuery=insertQuery.replaceFirst(",$", ") VALUES (");
+			valuesStr=valuesStr.replaceFirst(",$",")");
+			insertQuery+=valuesStr;
+			
+			PreparedStatement prepStmInsert = conn.prepareStatement(insertQuery);
 			Integer paramIndex = INITIAL_PARAM_INDEX;
-			prepStmInsert.setInt(++paramIndex, checkIn.getUserId());
-			prepStmInsert.setDouble(++paramIndex, checkIn.getLongitude());
-			prepStmInsert.setDouble(++paramIndex, checkIn.getLatitude());
-			prepStmInsert.setString(++paramIndex, checkIn.getDeviceName());
+			for (Object value : values) {
+				if(value instanceof Integer){
+					prepStmInsert.setInt(++paramIndex, (Integer)value);
+				}else if(value instanceof Double){
+					prepStmInsert.setDouble(++paramIndex, (Double)value);
+				}else if(value instanceof String){
+					prepStmInsert.setString(++paramIndex, (String)value);
+				}
+			}
 			if(prepStmInsert.executeUpdate()!=1){
-				throw new UnableToCreateCheckInException();
+				throw new UnableToCreateEntityException();
 			}
 			prepStmInsert.close();
 			
@@ -48,7 +81,7 @@ public class PersistenceManager {
 				if(identity==0){
 					throw new UnableToRetrieveIdException();
 				}
-				checkIn.setId(identity);
+				entity.setId(identity);
 			}else{
 				throw new UnableToRetrieveIdException();
 			}
@@ -58,86 +91,161 @@ public class PersistenceManager {
 			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new UnableToCreateCheckInException();
+			throw new UnableToCreateEntityException();
 		}
+		return entity;
 	}
 
-	public void initializeDB() throws SQLException {
-		deleteDB();
-		createDB();
-	}
-
-	private void createDB() throws SQLException {
-		Connection conn;
-		conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
+	/**
+	 * Retrieves from database the entity with the id equals to the one of the entity passed as parameter
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws UnableToRetrieveEntityException
+	 * @throws UnableToRetrieveIdException
+	 */
+	public PersistenceEntity read(PersistenceEntity entity) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
 		
-		String createCheckInTableQuery = "CREATE TABLE checkins("
-				+ "id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) PRIMARY KEY,"
-				+ "user_id INTEGER,"
-				+ "longitude DOUBLE," 
-				+ "latitude DOUBLE,"
-				+ "device VARCHAR(255))";			
-		PreparedStatement prepStmCreateCheckins = conn.prepareStatement(createCheckInTableQuery);
-		prepStmCreateCheckins.execute(); 
-		prepStmCreateCheckins.close();
+			
+		if(entity.getId()==null){
+			throw new UnableToRetrieveEntityException();
+		}else{
+			try {
+				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
+				
+				String selectQuery = "SELECT ";
+				Map<String, Class<?>> fieldsTypes = entity.getFieldsAndTypes();
+				for (String field : fieldsTypes.keySet()) {
+					selectQuery+=field+",";
+				}
+				selectQuery=selectQuery.replaceFirst(",$", "");
+				selectQuery+=" FROM " + entity.getTableName();
+				selectQuery+=" WHERE " + DB_IDENTIFIER_FIELD +"=?";
+			
+				PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
+				Integer paramIndex = INITIAL_PARAM_INDEX;
+				prepStmSelect.setInt(++paramIndex, entity.getId());
+				ResultSet rs = prepStmSelect.executeQuery();
+				LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+				if(rs.next()){
+					for (String field : fieldsTypes.keySet()) {
+						if(fieldsTypes.get(field).equals(Integer.class)){
+							Integer intValue = rs.getInt(field);
+							values.put(field, intValue);
+						}else if(fieldsTypes.get(field).equals(Double.class)){
+							Double doubleValue = rs.getDouble(field);
+							values.put(field, doubleValue);
+						}else if(fieldsTypes.get(field).equals(String.class)){
+							String strValue = rs.getString(field);
+							values.put(field, strValue);
+						}
+					}
+					entity.setValues(values);
+				}else{
+					return null;
+				}
+				prepStmSelect.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new UnableToRetrieveEntityException();
+			}
+			return entity;
+		}
 		
-		String createUserTableQuery = "CREATE TABLE users("
-				+ "id INTEGER GENERATED BY DEFAULT AS IDENTITY(START WITH 1) PRIMARY KEY,"
-				+ "login VARCHAR(255),"
-				+ "password VARCHAR(255))";			
-		PreparedStatement prepStmCreateUsers = conn.prepareStatement(createUserTableQuery);
-		prepStmCreateUsers.execute(); 
-		prepStmCreateUsers.close();
-		conn.close();
 	}
 	
-	private void deleteDB() throws SQLException{
+	/**
+	 * The entity provided is updated in database with the given values
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws UnableToUpdateEntityException
+	 */
+	public PersistenceEntity update(PersistenceEntity entity) throws UnableToUpdateEntityException {
 		Connection conn;
-		conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 		
-		String dropUsersTableQuery = "DROP TABLE users IF EXISTS";
-		String dropCheckInsTableQuery = "DROP TABLE checkins IF EXISTS";
-		PreparedStatement prepStmDropUsers = conn.prepareStatement(dropUsersTableQuery);
-		prepStmDropUsers.execute();
-		prepStmDropUsers.close();
-		PreparedStatement prepStmDropCheckins = conn.prepareStatement(dropCheckInsTableQuery);
-		prepStmDropCheckins.execute();
-		prepStmDropCheckins.close();
-		conn.close();
-	}
-
-	public CheckIn read(Integer id) throws UnableToRetrieveCheckInException, UnableToRetrieveIdException {
 		try {
-			Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
+			conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 			
-			String selectCheckInQuery = "SELECT checkins.id,users.id AS user, longitude, latitude, device "
-					+ "FROM checkins "
-					+ "LEFT JOIN users ON users.id=checkins.user_id "
-					+ "WHERE checkins.id=?"; 
-			PreparedStatement prepStmSelect = conn.prepareStatement(selectCheckInQuery);
-			Integer paramIndex = INITIAL_PARAM_INDEX;
-			prepStmSelect.setInt(++paramIndex, id);
-			ResultSet rsCheckIn = prepStmSelect.executeQuery();
-			CheckIn checkIn = null;
-			if(rsCheckIn.next()){
-				User user = new User("login","password");
-				user.setId(rsCheckIn.getInt("user"));
-				Double longitude=rsCheckIn.getDouble("longitude");
-				Double latitude=rsCheckIn.getDouble("latitude");
-				GeoLocation geoLoc = new GeoLocation(longitude, latitude);
-				Device device = new Device(rsCheckIn.getString("device"));
-				checkIn = new CheckIn(user, geoLoc, device);
-				checkIn.setId(rsCheckIn.getInt("id"));
-			}else{
-				throw new UnableToRetrieveIdException();
+			String updateQuery = "UPDATE " + entity.getTableName() + " SET ";
+			Map<String, Object> fieldsValues = entity.getFieldsAndValues();
+			List<Object> values = new LinkedList<Object>();
+			for (String field : fieldsValues.keySet()) {
+				if(!field.equalsIgnoreCase(DB_IDENTIFIER_FIELD) && fieldsValues.get(field)!=null){
+					updateQuery+=field+"=?,";
+					values.add(fieldsValues.get(field));
+				}		
 			}
-			prepStmSelect.close();
-			return checkIn;
+			updateQuery=updateQuery.replaceFirst(",$", " WHERE ");
+			updateQuery+=DB_IDENTIFIER_FIELD +"=?";
+			
+			PreparedStatement prepStmUpdate = conn.prepareStatement(updateQuery);
+			Integer paramIndex = INITIAL_PARAM_INDEX;
+			for (Object value : values) {
+				if(value instanceof Integer){
+					prepStmUpdate.setInt(++paramIndex, (Integer)value);
+				}else if(value instanceof Double){
+					prepStmUpdate.setDouble(++paramIndex, (Double)value);
+				}else if(value instanceof String){
+					prepStmUpdate.setString(++paramIndex, (String)value);
+				}
+			}
+			prepStmUpdate.setInt(++paramIndex, entity.getId());
+			if(prepStmUpdate.executeUpdate()!=1){
+				throw new UnableToUpdateEntityException();
+			}
+			prepStmUpdate.close();
+			
+			conn.close();
 		} catch (SQLException e) {
 			e.printStackTrace();
-			throw new UnableToRetrieveCheckInException();
+			throw new UnableToUpdateEntityException();
+		}
+		return entity;
+	}
+	
+	/**
+	 * Delete the register from database which has the same id provided in the parameter entity
+	 * 
+	 * @param entity
+	 * @return
+	 * @throws UnableToDeleteEntityException
+	 */
+	public PersistenceEntity delete(PersistenceEntity entity) throws UnableToDeleteEntityException {
+		if(entity.getId()==null){
+			throw new UnableToDeleteEntityException();
+		}else{
+			try {
+				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
+				
+				String deleteQuery = "DELETE FROM "+entity.getTableName();
+				deleteQuery+=" WHERE " + DB_IDENTIFIER_FIELD +"=?";
+			
+				PreparedStatement prepStmDelete = conn.prepareStatement(deleteQuery);
+				Integer paramIndex = INITIAL_PARAM_INDEX;
+				prepStmDelete.setInt(++paramIndex, entity.getId());
+				if(prepStmDelete.executeUpdate()!=1){
+					throw new UnableToDeleteEntityException();
+				}
+				prepStmDelete.close();
+				prepStmDelete.close();
+			} catch (SQLException e) {
+				e.printStackTrace();
+				throw new UnableToDeleteEntityException();
+			}
+			return entity;
 		}
 	}
+	
+	public void initializeDB() throws SQLException {
+		try{
+			executeScript("deleteDB.sql");
+		}catch(SQLSyntaxErrorException ssee){}
+		try{
+			executeScript("createDB.sql");
+		}catch(SQLSyntaxErrorException ssee){}
+	}
+
 
 	
 }
