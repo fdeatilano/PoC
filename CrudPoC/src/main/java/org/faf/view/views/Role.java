@@ -4,11 +4,11 @@ import org.faf.persistence.config.DbConfiguration;
 import org.faf.view.View;
 
 
-public class RoleView implements View{
+public class Role implements View{
 
 	private String role;
 
-	public RoleView(String role) {
+	public Role(String role) {
 		this.role=role;
 	}
 

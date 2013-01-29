@@ -155,8 +155,9 @@ public class PersistenceManager {
 						values.put(field, timestampValue);
 					}	
 				}
-				entity.setValues(values);
-				entities.add(entity);
+				PersistenceEntity actualEntity = (PersistenceEntity)entityClass.newInstance();
+				actualEntity.setValues(values);
+				entities.add(actualEntity);
 			}
 			prepStmSelect.close();
 			if(entities.size()==0){

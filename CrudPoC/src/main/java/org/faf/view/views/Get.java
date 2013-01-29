@@ -5,11 +5,11 @@ import java.util.List;
 import org.faf.persistence.PersistenceEntity;
 import org.faf.view.View;
 
-public class GetView implements View {
+public class Get implements View {
 
 	private List<PersistenceEntity> entities;
 
-	public GetView(List<PersistenceEntity> entities) {
+	public Get(List<PersistenceEntity> entities) {
 		this.entities=entities;
 	}
 

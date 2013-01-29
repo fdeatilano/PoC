@@ -3,25 +3,31 @@ package org.faf.controller;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
 import org.faf.persistence.PersistenceEntity;
 import org.faf.persistence.PersistenceManager;
 import org.faf.persistence.WhereClause;
+import org.faf.persistence.config.DbConfiguration;
 import org.faf.persistence.config.DbConfiguration.UsersFields;
 import org.faf.persistence.entities.User;
 import org.faf.persistence.exceptions.UnableToCreateEntityException;
+import org.faf.persistence.exceptions.UnableToDeleteEntityException;
 import org.faf.persistence.exceptions.UnableToRetrieveEntityException;
 import org.faf.persistence.exceptions.UnableToRetrieveIdException;
+import org.faf.persistence.exceptions.UnableToUpdateEntityException;
 import org.faf.view.View;
-import org.faf.view.views.GetView;
-import org.faf.view.views.PutView;
-import org.faf.view.views.RoleView;
+import org.faf.view.views.Delete;
+import org.faf.view.views.Get;
+import org.faf.view.views.Post;
+import org.faf.view.views.Put;
+import org.faf.view.views.Role;
 
 public class CrudController {
 
-	public RoleView authenticate(String login, String password) {
+	public View authenticate(String login, String password) {
 		PersistenceManager pm = new PersistenceManager();
 		
 		WhereClause where = new WhereClause();
@@ -35,7 +41,7 @@ public class CrudController {
 			return null;
 		}
 		if(userStored!=null){
-			return new RoleView(userStored.getRole());
+			return new Role(userStored.getRole());
 		}else{
 			return null;
 		}
@@ -49,31 +55,62 @@ public class CrudController {
 				String pswHash = convertToMD5(user.getPassword());
 				user.setPassword(pswHash);
 			}
-			pm.create(entity);
+			entity=pm.create(entity);
 		} catch (UnableToCreateEntityException | UnableToRetrieveIdException e) {
 			e.printStackTrace();
-			return new PutView(null);
+			return new Put(null);
 		}
-		return new PutView(entity);
+		return new Put(entity);
 	}
 
 	public View get(PersistenceEntity entity) {
 		PersistenceManager pm = new PersistenceManager();
+		List<PersistenceEntity> entities = null;
 		Map<String,Object> fieldsValues = entity.getFieldsAndValues();
 		WhereClause where = new WhereClause();
+		if(entity.getId()!=null){
+			where.addCriteria(DbConfiguration.DB_IDENTIFIER_FIELD, entity.getId());
+		}
 		for (String field : fieldsValues.keySet()) {
 			where.addCriteria(field, fieldsValues.get(field));
 		}
-		List<PersistenceEntity> entities = null;
 		try {
 			entities = pm.read(entity.getClass(), where);
 		} catch (UnableToRetrieveEntityException | UnableToRetrieveIdException e) {
 			e.printStackTrace();
-			return new GetView(null);
+			return new Get(null);
 		}
-		return new GetView(entities);
+		return new Get(entities);
 	}
 
+	public Post post(PersistenceEntity entity) {
+		PersistenceManager pm = new PersistenceManager();
+		try {
+			if(entity.getClass().equals(User.class)){
+				User user = (User)entity;
+				String pswHash = convertToMD5(user.getPassword());
+				user.setPassword(pswHash);
+			}
+			pm.update(entity);
+		} catch (UnableToUpdateEntityException e) {
+			e.printStackTrace();
+			return new Post(null);
+		}
+		return new Post(entity);
+	}
+	
+	public View delete(PersistenceEntity entity) {
+		PersistenceManager pm = new PersistenceManager();
+		try {
+			pm.delete(entity.getClass(), entity.getId());
+		} catch (UnableToDeleteEntityException e) {
+			e.printStackTrace();
+			return new Delete(null);
+		}
+		return new Delete(entity);
+		
+	}
+	
 	public String convertToMD5(String input){
         
         String md5 = null;
@@ -89,4 +126,5 @@ public class CrudController {
         }
         return md5;
     }
+
 }

@@ -201,7 +201,7 @@ public class CheckIn implements PersistenceEntity{
 
 	@Override
 	public String toString() {
-		return "CheckIn [id=" + id + ", user=" + user + ", place=" + place
+		return "CheckIn [id=" + id + ", user=" + ((user==null)?null:user.getId()) + ", place=" + ((place==null)?null:place.getId())
 				+ ", checkTime=" + checkTime + ", device=" + device
 				+ ", longitude=" + longitude + ", latitude=" + latitude + "]";
 	}
