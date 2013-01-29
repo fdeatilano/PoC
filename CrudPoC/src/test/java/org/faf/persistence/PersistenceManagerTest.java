@@ -3,6 +3,8 @@ package org.faf.persistence;
 
 import java.sql.SQLException;
 
+import org.faf.persistence.config.DbConfiguration;
+import org.faf.persistence.config.DbConfiguration.UsersFields;
 import org.faf.persistence.entities.CheckIn;
 import org.faf.persistence.entities.Place;
 import org.faf.persistence.entities.User;
@@ -32,7 +34,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testCreateUser() throws Exception {
-		User user = new User("login",null);
+		User user = new User("login",null,DbConfiguration.ROLE_ADMIN);
 		_pm.create(user);
 		Assert.assertEquals(new Integer(1), user.getId());
 	}
@@ -46,7 +48,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testCreateCheckIn() throws Exception {
-		User user = new User(null,"password");
+		User user = new User(null,"password",null);
 		_pm.create(user);
 		Place place = new Place(1.0,2.0,"address");
 		_pm.create(place);
@@ -57,14 +59,27 @@ public class PersistenceManagerTest {
 	
 	@Test(expected=UnableToRetrieveEntityException.class)
 	public void testReadWithNullId() throws Exception {
-		_pm.read(User.class,null);
+		_pm.read(User.class,(Integer)null);
 	}
 		
 	@Test
 	public void testReadUser() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",DbConfiguration.ROLE_USER);
 		_pm.create(user);
 		User storedUser = (User)_pm.read(User.class, user.getId());
+		Assert.assertEquals(user,storedUser);
+	}
+	
+	@Test
+	public void testReadUserWithLoginAndPassword() throws Exception {
+		String login = "login";
+		String password = "password";
+		User user = new User(login,password,DbConfiguration.ROLE_USER);
+		_pm.create(user);
+		WhereClause where = new WhereClause();
+		where.addCriteria(UsersFields.LOGIN.name(), login);
+		where.addCriteria(UsersFields.PASSWORD.name(), password);
+		User storedUser = (User)_pm.read(User.class, where).get(0);
 		Assert.assertEquals(user,storedUser);
 	}
 	
@@ -78,7 +93,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testReadCheckIn() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",null);
 		_pm.create(user);
 		Place place = new Place(1.0,2.0,"address");
 		_pm.create(place);
@@ -95,7 +110,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testUpdateUser() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",null);
 		_pm.create(user);
 		user.setLogin("updatedLogin");
 		user.setPassword("updatedPassword");
@@ -118,7 +133,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testUpdateCheckin() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",null);
 		_pm.create(user);
 		Place place = new Place(1.0,2.0,"address");
 		_pm.create(place);
@@ -139,7 +154,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testDeleteUser() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",null);
 		_pm.create(user);
 		User storedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(user,storedUser);
@@ -161,7 +176,7 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testDeleteCheckIn() throws Exception {
-		User user = new User("login","password");
+		User user = new User("login","password",null);
 		_pm.create(user);
 		Place place = new Place(1.0,2.0,"address");
 		_pm.create(place);

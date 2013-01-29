@@ -101,6 +101,81 @@ public class PersistenceManager {
 	}
 
 	/**
+	 * Retrieves from database the entities that match the criteria provided by the where clause
+	 * 
+	 * @param entityClass
+	 * @param where clause storing the search criteria
+	 * @return
+	 * @throws UnableToRetrieveEntityException
+	 * @throws UnableToRetrieveIdException
+	 */
+	public List<PersistenceEntity> read(Class<?> entityClass, WhereClause where) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
+		try {
+			PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
+			Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
+			
+			String selectQuery = "SELECT ";
+			Map<String, Class<?>> fieldsTypes = entity.getFieldsAndTypes();
+			for (String field : fieldsTypes.keySet()) {
+				selectQuery+=field+",";
+			}
+			selectQuery=selectQuery.replaceFirst(",$", "");
+			selectQuery+=" FROM " + entity.getTableName();
+			selectQuery+=where.getClause();
+		
+			PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
+			Integer paramIndex = INITIAL_PARAM_INDEX;
+			for (Object value : where.getValues()) {
+				if(value instanceof Integer){
+					prepStmSelect.setInt(++paramIndex, (Integer)value);
+				}else if(value instanceof Double){
+					prepStmSelect.setDouble(++paramIndex, (Double)value);
+				}else if(value instanceof String){
+					prepStmSelect.setString(++paramIndex, (String)value);
+				}else if(value instanceof Timestamp){
+					prepStmSelect.setTimestamp(++paramIndex, (Timestamp)value);
+				}
+			}
+			ResultSet rs = prepStmSelect.executeQuery();
+			LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
+			List<PersistenceEntity> entities = new LinkedList<PersistenceEntity>();
+			while(rs.next()){
+				for (String field : fieldsTypes.keySet()) {
+					if(fieldsTypes.get(field).equals(Integer.class)){
+						Integer intValue = rs.getInt(field);
+						values.put(field, intValue);
+					}else if(fieldsTypes.get(field).equals(Double.class)){
+						Double doubleValue = rs.getDouble(field);
+						values.put(field, doubleValue);
+					}else if(fieldsTypes.get(field).equals(String.class)){
+						String strValue = rs.getString(field);
+						values.put(field, strValue);
+					}else if(fieldsTypes.get(field).equals(Timestamp.class)){
+						Timestamp timestampValue = rs.getTimestamp(field);
+						values.put(field, timestampValue);
+					}	
+				}
+				entity.setValues(values);
+				entities.add(entity);
+			}
+			prepStmSelect.close();
+			if(entities.size()==0){
+				return null;
+			}
+			return entities;
+			
+		} catch (SQLException e) {
+			e.printStackTrace();
+			throw new UnableToRetrieveEntityException(e);
+		} catch (InstantiationException e) {
+			e.printStackTrace();
+			throw new UnableToRetrieveEntityException(e);
+		} catch (IllegalAccessException e) {
+			e.printStackTrace();
+			throw new UnableToRetrieveEntityException(e);
+		}
+	}
+	/**
 	 * Retrieves from database the entity with the identifier and types provided
 	 * 
 	 * @param entityClass
@@ -110,61 +185,17 @@ public class PersistenceManager {
 	 * @throws UnableToRetrieveIdException
 	 */
 	public PersistenceEntity read(Class<?> entityClass, Integer identifier) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
-		
 			
 		if(identifier==null){
 			throw new UnableToRetrieveEntityException();
 		}else{
-			try {
-				PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
-				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
-				
-				String selectQuery = "SELECT ";
-				Map<String, Class<?>> fieldsTypes = entity.getFieldsAndTypes();
-				for (String field : fieldsTypes.keySet()) {
-					selectQuery+=field+",";
-				}
-				selectQuery=selectQuery.replaceFirst(",$", "");
-				selectQuery+=" FROM " + entity.getTableName();
-				selectQuery+=" WHERE " + DB_IDENTIFIER_FIELD +"=?";
-			
-				PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
-				Integer paramIndex = INITIAL_PARAM_INDEX;
-				prepStmSelect.setInt(++paramIndex, identifier);
-				ResultSet rs = prepStmSelect.executeQuery();
-				LinkedHashMap<String, Object> values = new LinkedHashMap<String, Object>();
-				if(rs.next()){
-					for (String field : fieldsTypes.keySet()) {
-						if(fieldsTypes.get(field).equals(Integer.class)){
-							Integer intValue = rs.getInt(field);
-							values.put(field, intValue);
-						}else if(fieldsTypes.get(field).equals(Double.class)){
-							Double doubleValue = rs.getDouble(field);
-							values.put(field, doubleValue);
-						}else if(fieldsTypes.get(field).equals(String.class)){
-							String strValue = rs.getString(field);
-							values.put(field, strValue);
-						}else if(fieldsTypes.get(field).equals(Timestamp.class)){
-							Timestamp timestampValue = rs.getTimestamp(field);
-							values.put(field, timestampValue);
-						}	
-					}
-					entity.setValues(values);
-				}else{
-					return null;
-				}
-				prepStmSelect.close();
-				return entity;
-				
-			} catch (SQLException e) {
-				e.printStackTrace();
-				throw new UnableToRetrieveEntityException(e);
-			} catch (InstantiationException e) {
-				e.printStackTrace();
-				throw new UnableToRetrieveEntityException(e);
-			} catch (IllegalAccessException e) {
-				e.printStackTrace();
-				throw new UnableToRetrieveEntityException(e);
+			WhereClause where = new WhereClause();
+			where.addCriteria(DB_IDENTIFIER_FIELD, identifier);
+			List<PersistenceEntity> entities = read(entityClass,where);
+			if(entities==null){
+				return null;
+			}else{
+				return entities.get(0);
 			}
 		}		
 	}
