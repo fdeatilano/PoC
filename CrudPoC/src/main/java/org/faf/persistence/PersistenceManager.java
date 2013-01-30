@@ -38,6 +38,11 @@ public class PersistenceManager {
 	 */
 	public PersistenceEntity create(PersistenceEntity entity) throws UnableToCreateEntityException, UnableToRetrieveIdException {
 		Connection conn;
+		try {
+			Class.forName("org.hsqldb.jdbcDriver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		try {
 			conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
@@ -111,6 +116,12 @@ public class PersistenceManager {
 	 */
 	public List<PersistenceEntity> read(Class<?> entityClass, WhereClause where) throws UnableToRetrieveEntityException, UnableToRetrieveIdException {
 		try {
+			try {
+				Class.forName("org.hsqldb.jdbcDriver");
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			
 			PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
 			Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 			
@@ -123,6 +134,7 @@ public class PersistenceManager {
 			selectQuery+=" FROM " + entity.getTableName();
 			selectQuery+=where.getClause();
 		
+			System.out.println(selectQuery);
 			PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
 			Integer paramIndex = INITIAL_PARAM_INDEX;
 			for (Object value : where.getValues()) {
@@ -176,6 +188,7 @@ public class PersistenceManager {
 			throw new UnableToRetrieveEntityException(e);
 		}
 	}
+	
 	/**
 	 * Retrieves from database the entity with the identifier and types provided
 	 * 
@@ -210,6 +223,12 @@ public class PersistenceManager {
 	 */
 	public PersistenceEntity update(PersistenceEntity entity) throws UnableToUpdateEntityException {
 		Connection conn;
+		
+		try {
+			Class.forName("org.hsqldb.jdbcDriver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		
 		try {
 			conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
@@ -266,6 +285,11 @@ public class PersistenceManager {
 			throw new UnableToDeleteEntityException();
 		}else{
 			try {
+				Class.forName("org.hsqldb.jdbcDriver");
+			} catch (ClassNotFoundException e) {
+				e.printStackTrace();
+			}
+			try {
 				PersistenceEntity entity = (PersistenceEntity)entityClass.newInstance();
 				Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 				
@@ -296,12 +320,13 @@ public class PersistenceManager {
 	public void initializeDB() throws SQLException {
 		try{
 			executeScript("deleteDB.sql");
-		}catch(SQLSyntaxErrorException ssee){}
+		}catch(SQLSyntaxErrorException ssee){ssee.printStackTrace();}
 		try{
 			executeScript("createDB.sql");
-		}catch(SQLSyntaxErrorException ssee){}
+		}catch(SQLSyntaxErrorException ssee){ssee.printStackTrace();}
+		try{
+			executeScript("initializeDB.sql");
+		}catch(SQLSyntaxErrorException ssee){ssee.printStackTrace();}
 	}
-
-
 	
 }

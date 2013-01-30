@@ -56,7 +56,7 @@ public class Place implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.PLACES_TABLE;
+		return DbConfiguration.Tables.PLACES.name();
 	}
 
 	@Override

@@ -8,7 +8,15 @@ public class DbConfiguration {
 	public static final Integer INITIAL_PARAM_INDEX = 0;
 	public static final String DB_IDENTIFIER_FIELD = "id";
 	
-	public static final String USERS_TABLE = "users";
+	public static enum Tables{
+		USERS("users"),PLACES("places"),CHECKINS("checkins");
+	
+		private String name;
+		Tables(String name){
+			this.name=name;
+		}
+	};
+	
 	public static enum UsersFields{
 		ID(DB_IDENTIFIER_FIELD),LOGIN("login"),PASSWORD("password"),ROLE("role");
 	
@@ -17,10 +25,7 @@ public class DbConfiguration {
 			this.name=name;
 		}
 	};
-	public static final String ROLE_ADMIN = "Administrator";
-	public static final String ROLE_USER = "User";
 	
-	public static final String CHECKINS_TABLE = "checkins";
 	public static enum CheckinsFields{
 		ID(DB_IDENTIFIER_FIELD),USER_ID("user_id"),PLACE_ID("place_id"),CHECK_TIME("check_time"),LONGITUDE("longitude"),LATITUDE("latitude"),DEVICE("device");
 	
@@ -30,7 +35,6 @@ public class DbConfiguration {
 		}
 	};
 	
-	public static final String PLACES_TABLE = "places";
 	public static enum PlacesFields{
 		ID(DB_IDENTIFIER_FIELD),LONGITUDE("longitude"),LATITUDE("latitude"),ADDRESS("address");
 	
@@ -39,4 +43,9 @@ public class DbConfiguration {
 			this.name=name;
 		}
 	};
+	
+	public static final String ROLE_ADMIN = "Administrator";
+	public static final String ROLE_USER = "User";
+	public static final Object AUTHENTICATE_URL = "authenticate";
+	public static final Object INITIALIZE_DB_URL = "initializeApplication";
 }

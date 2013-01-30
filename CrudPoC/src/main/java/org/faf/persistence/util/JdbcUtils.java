@@ -16,6 +16,11 @@ import java.sql.Statement;
 public class JdbcUtils {
 
 	public static boolean executeScript(String scriptName) throws SQLException {
+		try {
+			Class.forName("org.hsqldb.jdbcDriver");
+		} catch (ClassNotFoundException e) {
+			e.printStackTrace();
+		}
 		Connection conn = DriverManager.getConnection(DB_URI, DB_USER, DB_PASSWORD);
 		try {
 			Statement stm = conn.createStatement();
@@ -28,8 +33,11 @@ public class JdbcUtils {
 				if(line!=null && !line.trim().startsWith("--")){
 					stmStr+=line;
 				}
+				if(line!=null && line.trim().endsWith(";")){
+					stm.execute(stmStr);
+					stmStr="";
+				}
 			}
-			stm.execute(stmStr);
 			stm.close();
 		} catch (IOException e) {
 			conn.close();

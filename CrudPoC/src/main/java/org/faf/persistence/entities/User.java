@@ -55,7 +55,7 @@ public class User implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.USERS_TABLE;
+		return DbConfiguration.Tables.USERS.name();
 	}
 
 	@Override

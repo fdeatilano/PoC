@@ -81,7 +81,7 @@ public class CheckIn implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.CHECKINS_TABLE;
+		return DbConfiguration.Tables.CHECKINS.name();
 	}
 
 	@Override

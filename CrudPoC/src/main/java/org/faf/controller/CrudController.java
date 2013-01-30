@@ -3,6 +3,7 @@ package org.faf.controller;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
@@ -35,8 +36,16 @@ public class CrudController {
 		where.addCriteria(UsersFields.PASSWORD.name(), convertToMD5(password));
 		User userStored;
 		try {
-			userStored = (User) pm.read(User.class, where).get(0);
-		} catch (UnableToRetrieveEntityException | UnableToRetrieveIdException e) {
+			List<PersistenceEntity> entities = pm.read(User.class, where);
+			if(entities==null){
+				return null;
+			}else{
+				userStored = (User) entities.get(0);
+			}
+		} catch (UnableToRetrieveEntityException e){
+			e.printStackTrace();
+			return null;
+		} catch (UnableToRetrieveIdException e) {
 			e.printStackTrace();
 			return null;
 		}
@@ -56,7 +65,10 @@ public class CrudController {
 				user.setPassword(pswHash);
 			}
 			entity=pm.create(entity);
-		} catch (UnableToCreateEntityException | UnableToRetrieveIdException e) {
+		} catch (UnableToCreateEntityException e){
+			e.printStackTrace();
+			return new Put(null);
+		} catch (UnableToRetrieveIdException e) {
 			e.printStackTrace();
 			return new Put(null);
 		}
@@ -76,7 +88,10 @@ public class CrudController {
 		}
 		try {
 			entities = pm.read(entity.getClass(), where);
-		} catch (UnableToRetrieveEntityException | UnableToRetrieveIdException e) {
+		} catch (UnableToRetrieveEntityException e){
+			e.printStackTrace();
+			return new Get(null);	
+		} catch (UnableToRetrieveIdException e) {
 			e.printStackTrace();
 			return new Get(null);
 		}
@@ -109,6 +124,15 @@ public class CrudController {
 		}
 		return new Delete(entity);
 		
+	}
+
+	public void initialize() {
+		PersistenceManager pm = new PersistenceManager();
+		try {
+			pm.initializeDB();
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public String convertToMD5(String input){

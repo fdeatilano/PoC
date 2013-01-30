@@ -3,5 +3,13 @@
  "http://java.sun.com/dtd/web-app_2_3.dtd" >
 
 <web-app>
-  <display-name>Archetype Created Web Application</display-name>
+  <display-name>CRUD Proof of Concept Application</display-name>
+  <servlet>
+	<servlet-name>FrontController</servlet-name>
+	<servlet-class>org.faf.controller.FrontController</servlet-class>
+  </servlet>
+  <servlet-mapping>
+	<servlet-name>FrontController</servlet-name>
+	<url-pattern>/controller/*</url-pattern>
+  </servlet-mapping>
 </web-app>
