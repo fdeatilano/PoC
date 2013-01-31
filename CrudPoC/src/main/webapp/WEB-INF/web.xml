@@ -12,4 +12,11 @@
 	<servlet-name>FrontController</servlet-name>
 	<url-pattern>/controller/*</url-pattern>
   </servlet-mapping>
+  
+  <listener>
+	<listener-class>
+		org.faf.listeners.InitializeApplicationListener
+	</listener-class>
+  </listener>
+  
 </web-app>

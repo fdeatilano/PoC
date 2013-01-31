@@ -1,10 +1,10 @@
 package org.faf.persistence;
 
-import static org.faf.persistence.config.DbConfiguration.DB_IDENTIFIER_FIELD;
-import static org.faf.persistence.config.DbConfiguration.DB_PASSWORD;
-import static org.faf.persistence.config.DbConfiguration.DB_URI;
-import static org.faf.persistence.config.DbConfiguration.DB_USER;
-import static org.faf.persistence.config.DbConfiguration.INITIAL_PARAM_INDEX;
+import static org.faf.config.AppConfiguration.DB_IDENTIFIER_FIELD;
+import static org.faf.config.AppConfiguration.DB_PASSWORD;
+import static org.faf.config.AppConfiguration.DB_URI;
+import static org.faf.config.AppConfiguration.DB_USER;
+import static org.faf.config.AppConfiguration.INITIAL_PARAM_INDEX;
 import static org.faf.persistence.util.JdbcUtils.executeScript;
 
 import java.sql.Connection;
@@ -134,7 +134,6 @@ public class PersistenceManager {
 			selectQuery+=" FROM " + entity.getTableName();
 			selectQuery+=where.getClause();
 		
-			System.out.println(selectQuery);
 			PreparedStatement prepStmSelect = conn.prepareStatement(selectQuery);
 			Integer paramIndex = INITIAL_PARAM_INDEX;
 			for (Object value : where.getValues()) {

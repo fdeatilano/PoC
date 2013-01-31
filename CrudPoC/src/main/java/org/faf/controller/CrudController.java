@@ -1,24 +1,21 @@
 package org.faf.controller;
 
-import java.math.BigInteger;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.sql.SQLException;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
+import org.faf.config.AppConfiguration;
+import org.faf.config.AppConfiguration.UsersFields;
 import org.faf.persistence.PersistenceEntity;
 import org.faf.persistence.PersistenceManager;
 import org.faf.persistence.WhereClause;
-import org.faf.persistence.config.DbConfiguration;
-import org.faf.persistence.config.DbConfiguration.UsersFields;
 import org.faf.persistence.entities.User;
 import org.faf.persistence.exceptions.UnableToCreateEntityException;
 import org.faf.persistence.exceptions.UnableToDeleteEntityException;
 import org.faf.persistence.exceptions.UnableToRetrieveEntityException;
 import org.faf.persistence.exceptions.UnableToRetrieveIdException;
 import org.faf.persistence.exceptions.UnableToUpdateEntityException;
+import org.faf.security.CryptographicUtils;
 import org.faf.view.View;
 import org.faf.view.views.Delete;
 import org.faf.view.views.Get;
@@ -33,12 +30,15 @@ public class CrudController {
 		
 		WhereClause where = new WhereClause();
 		where.addCriteria(UsersFields.LOGIN.name(), login);
-		where.addCriteria(UsersFields.PASSWORD.name(), convertToMD5(password));
+		where.addCriteria(UsersFields.PASSWORD.name(), CryptographicUtils.convertToMD5(password));
+		if(where.isEmpty()){
+			return new Role(null);
+		}
 		User userStored;
 		try {
 			List<PersistenceEntity> entities = pm.read(User.class, where);
 			if(entities==null){
-				return null;
+				return new Role(null);
 			}else{
 				userStored = (User) entities.get(0);
 			}
@@ -49,10 +49,10 @@ public class CrudController {
 			e.printStackTrace();
 			return null;
 		}
-		if(userStored!=null){
-			return new Role(userStored.getRole());
+		if(userStored==null){
+			return new Role(null);
 		}else{
-			return null;
+			return new Role(userStored.getRole());
 		}
 	}
 	
@@ -61,7 +61,7 @@ public class CrudController {
 		try {
 			if(entity.getClass().equals(User.class)){
 				User user = (User)entity;
-				String pswHash = convertToMD5(user.getPassword());
+				String pswHash = CryptographicUtils.convertToMD5(user.getPassword());
 				user.setPassword(pswHash);
 			}
 			entity=pm.create(entity);
@@ -81,7 +81,7 @@ public class CrudController {
 		Map<String,Object> fieldsValues = entity.getFieldsAndValues();
 		WhereClause where = new WhereClause();
 		if(entity.getId()!=null){
-			where.addCriteria(DbConfiguration.DB_IDENTIFIER_FIELD, entity.getId());
+			where.addCriteria(AppConfiguration.DB_IDENTIFIER_FIELD, entity.getId());
 		}
 		for (String field : fieldsValues.keySet()) {
 			where.addCriteria(field, fieldsValues.get(field));
@@ -103,7 +103,7 @@ public class CrudController {
 		try {
 			if(entity.getClass().equals(User.class)){
 				User user = (User)entity;
-				String pswHash = convertToMD5(user.getPassword());
+				String pswHash = CryptographicUtils.convertToMD5(user.getPassword());
 				user.setPassword(pswHash);
 			}
 			pm.update(entity);
@@ -135,20 +135,4 @@ public class CrudController {
 		}
 	}
 	
-	public String convertToMD5(String input){
-        
-        String md5 = null;
-        if(null == input) return null;
-        try {
-	        MessageDigest digest = MessageDigest.getInstance("MD5");
-	        digest.update(input.getBytes());
-	        BigInteger bi = new BigInteger(1, digest.digest());
-	        md5 = bi.toString(16);
-	        
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        return md5;
-    }
-
 }

@@ -2,9 +2,9 @@ package org.faf.persistence.entities;
 
 import java.util.LinkedHashMap;
 
+import org.faf.config.AppConfiguration;
+import org.faf.config.AppConfiguration.UsersFields;
 import org.faf.persistence.PersistenceEntity;
-import org.faf.persistence.config.DbConfiguration;
-import org.faf.persistence.config.DbConfiguration.UsersFields;
 
 public class User implements PersistenceEntity{
 
@@ -55,7 +55,7 @@ public class User implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.Tables.USERS.name();
+		return AppConfiguration.Tables.USERS.name();
 	}
 
 	@Override
@@ -138,8 +138,7 @@ public class User implements PersistenceEntity{
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", login=" + login + ", password=" + password
-				+ ", role=" + role + "]";
+		return "User [id=" + id + ", login=" + login + ", role=" + role + "]";
 	}
 	
 }

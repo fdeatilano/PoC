@@ -1,6 +1,6 @@
 package org.faf.view.views;
 
-import org.faf.persistence.config.DbConfiguration;
+import org.faf.config.AppConfiguration;
 import org.faf.view.View;
 
 
@@ -13,7 +13,7 @@ public class Role implements View{
 	}
 
 	public Boolean isAdmin() {
-		if(role.equals(DbConfiguration.ROLE_ADMIN)){
+		if(role.equals(AppConfiguration.ROLE_ADMIN)){
 			return true;
 		}else{
 			return false;
@@ -21,7 +21,7 @@ public class Role implements View{
 	}
 	
 	public Boolean isUser() {
-		if(role.equals(DbConfiguration.ROLE_USER)){
+		if(role.equals(AppConfiguration.ROLE_USER)){
 			return true;
 		}else{
 			return false;

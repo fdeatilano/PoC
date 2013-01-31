@@ -3,8 +3,8 @@ package org.faf.persistence;
 
 import java.sql.SQLException;
 
-import org.faf.persistence.config.DbConfiguration;
-import org.faf.persistence.config.DbConfiguration.UsersFields;
+import org.faf.config.AppConfiguration;
+import org.faf.config.AppConfiguration.UsersFields;
 import org.faf.persistence.entities.CheckIn;
 import org.faf.persistence.entities.Place;
 import org.faf.persistence.entities.User;
@@ -12,6 +12,8 @@ import org.faf.persistence.exceptions.UnableToCreateEntityException;
 import org.faf.persistence.exceptions.UnableToDeleteEntityException;
 import org.faf.persistence.exceptions.UnableToRetrieveEntityException;
 import org.faf.persistence.exceptions.UnableToUpdateEntityException;
+import org.faf.persistence.util.JdbcUtils;
+import org.faf.security.CryptographicUtils;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
@@ -34,9 +36,9 @@ public class PersistenceManagerTest {
 	
 	@Test
 	public void testCreateUser() throws Exception {
-		User user = new User("login",null,DbConfiguration.ROLE_ADMIN);
+		User user = new User("login",null,AppConfiguration.ROLE_ADMIN);
 		_pm.create(user);
-		Assert.assertEquals(new Integer(1), user.getId());
+		Assert.assertEquals(new Integer(2), user.getId());
 	}
 	
 	@Test
@@ -64,7 +66,7 @@ public class PersistenceManagerTest {
 		
 	@Test
 	public void testReadUser() throws Exception {
-		User user = new User("login","password",DbConfiguration.ROLE_USER);
+		User user = new User("login","password",AppConfiguration.ROLE_USER);
 		_pm.create(user);
 		User storedUser = (User)_pm.read(User.class, user.getId());
 		Assert.assertEquals(user,storedUser);
@@ -74,7 +76,7 @@ public class PersistenceManagerTest {
 	public void testReadUserWithLoginAndPassword() throws Exception {
 		String login = "login";
 		String password = "password";
-		User user = new User(login,password,DbConfiguration.ROLE_USER);
+		User user = new User(login,password,AppConfiguration.ROLE_USER);
 		_pm.create(user);
 		WhereClause where = new WhereClause();
 		where.addCriteria(UsersFields.LOGIN.name(), login);

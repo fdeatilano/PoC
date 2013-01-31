@@ -3,9 +3,9 @@ package org.faf.persistence.entities;
 import java.sql.Timestamp;
 import java.util.LinkedHashMap;
 
+import org.faf.config.AppConfiguration;
+import org.faf.config.AppConfiguration.CheckinsFields;
 import org.faf.persistence.PersistenceEntity;
-import org.faf.persistence.config.DbConfiguration;
-import org.faf.persistence.config.DbConfiguration.CheckinsFields;
 
 public class CheckIn implements PersistenceEntity{
 
@@ -81,7 +81,7 @@ public class CheckIn implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.Tables.CHECKINS.name();
+		return AppConfiguration.Tables.CHECKINS.name();
 	}
 
 	@Override

@@ -32,4 +32,5 @@ public class JdbcUtilTest {
 	public void testFileWithComment() throws Exception {
 		Assert.assertEquals(true, JdbcUtils.executeScript("testStatementsAndComments.sql"));
 	}
+		
 }

@@ -2,9 +2,9 @@ package org.faf.persistence.entities;
 
 import java.util.LinkedHashMap;
 
+import org.faf.config.AppConfiguration;
+import org.faf.config.AppConfiguration.PlacesFields;
 import org.faf.persistence.PersistenceEntity;
-import org.faf.persistence.config.DbConfiguration;
-import org.faf.persistence.config.DbConfiguration.PlacesFields;
 
 
 public class Place implements PersistenceEntity{
@@ -56,7 +56,7 @@ public class Place implements PersistenceEntity{
 
 	@Override
 	public String getTableName() {
-		return DbConfiguration.Tables.PLACES.name();
+		return AppConfiguration.Tables.PLACES.name();
 	}
 
 	@Override

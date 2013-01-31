@@ -33,4 +33,12 @@ public class WhereClause {
 	public Collection<Object> getValues(){
 		return criteria.values();
 	}
+
+	public boolean isEmpty() {
+		boolean isEmpty=true;
+		for (Object value : criteria.values()) {
+			if(value!=null) isEmpty=false;
+		}
+		return isEmpty;
+	}
 }

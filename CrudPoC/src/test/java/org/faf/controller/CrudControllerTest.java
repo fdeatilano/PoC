@@ -4,9 +4,9 @@ import java.sql.SQLException;
 import java.util.LinkedList;
 import java.util.List;
 
+import org.faf.config.AppConfiguration;
 import org.faf.persistence.PersistenceEntity;
 import org.faf.persistence.PersistenceManager;
-import org.faf.persistence.config.DbConfiguration;
 import org.faf.persistence.entities.CheckIn;
 import org.faf.persistence.entities.Place;
 import org.faf.persistence.entities.User;
@@ -19,7 +19,7 @@ import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-public class ControllerTest {
+public class CrudControllerTest {
 	
 	private CrudController _crudController;
 	private PersistenceManager _pm;
@@ -33,14 +33,15 @@ public class ControllerTest {
 	
 	@Test
 	public void testWrongAuthentication() throws Exception {
-		Assert.assertEquals(null, _crudController.authenticate(null, null));
+		Role expectedRole = new Role(null);
+		Assert.assertEquals(expectedRole.render(), _crudController.authenticate(null, null).render());
 	}
 	
 	@Test
 	public void testAdminAuthentication() throws Exception {
 		String login = "admin";
 		String password = "admin";
-		PersistenceEntity inputUser = new User(login,password,DbConfiguration.ROLE_ADMIN);
+		PersistenceEntity inputUser = new User(login,password,AppConfiguration.ROLE_ADMIN);
 		_crudController.put(inputUser);
 		Role role = (Role) _crudController.authenticate(login, password);
 		Assert.assertEquals(true, role.isAdmin());
@@ -48,7 +49,7 @@ public class ControllerTest {
 	
 	@Test
 	public void testPutUser() throws Exception {
-		PersistenceEntity inputUser = new User("admin","admin",DbConfiguration.ROLE_ADMIN);
+		PersistenceEntity inputUser = new User("admin","admin",AppConfiguration.ROLE_ADMIN);
 		_crudController.put(inputUser);
 		View actualView = (Get) _crudController.get(inputUser);
 		List<PersistenceEntity> entities = new LinkedList<PersistenceEntity>();
@@ -63,9 +64,9 @@ public class ControllerTest {
 		_crudController.put(preferedPlace);
 		PersistenceEntity exclusivePlace = new Place(1.0,2.0,"Exclusive place");
 		_crudController.put(exclusivePlace);
-		PersistenceEntity tom = new User("tom","password",DbConfiguration.ROLE_USER);
+		PersistenceEntity tom = new User("tom","password",AppConfiguration.ROLE_USER);
 		_crudController.put(tom);
-		PersistenceEntity ann = new User("ann","password",DbConfiguration.ROLE_USER);
+		PersistenceEntity ann = new User("ann","password",AppConfiguration.ROLE_USER);
 		_crudController.put(ann);
 		
 		PersistenceEntity checkInTom = new CheckIn((User)tom,(Place)preferedPlace,4.1,4.9,"Tom's phone");
@@ -104,7 +105,7 @@ public class ControllerTest {
 	public void testDeleteCheckIn() throws Exception {
 		PersistenceEntity place = new Place(4.0,5.0,"Address");
 		_crudController.put(place);
-		PersistenceEntity user = new User("login","password",DbConfiguration.ROLE_ADMIN);
+		PersistenceEntity user = new User("login","password",AppConfiguration.ROLE_ADMIN);
 		_crudController.put(user);
 		PersistenceEntity checkIn = new CheckIn((User)user,(Place)place,4.0,5.0,"Device");
 		_crudController.put(checkIn);
