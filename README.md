@@ -34,10 +34,12 @@ Use Guide for CrudPoC
 	- checkins
 	
 	
+	
 - Permissions:
 
 	- Administrator role can perform any action.
 	- User role can authenticate, read data from all entities and put checkins.
+	
 	
 	
 - Examples of valid calls:
