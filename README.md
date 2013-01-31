@@ -42,29 +42,50 @@ Use Guide for CrudPoC
 	
 - Examples of valid calls:
 	
-	GET http://localhost:8080/CrudPoC/controller/users -> Retrieves all users stored in database
+	Retrieves all users stored in database:
 	
-	GET http://localhost:8080/CrudPoC/controller/places -> Retrieves all places stored in database
+		GET http://localhost:8080/CrudPoC/controller/users
 	
-	GET http://localhost:8080/CrudPoC/controller/checkins -> Retrieves all checkins stored in database
+	Retrieves all places stored in database:
 	
+		GET http://localhost:8080/CrudPoC/controller/places
 	
-	PUT http://localhost:8080/CrudPoC/controller/users?login=login&password=pass&role=[User|Administrator] -> Creates a new user with role User or Administrator
+	Retrieves all checkins stored in database:
 	
-	PUT http://localhost:8080/CrudPoC/controller/places?longitude=2.34&latitude=8.90&address=Almond Street -> Creates a new place
+		GET http://localhost:8080/CrudPoC/controller/checkins
 	
-	PUT http://localhost:8080/CrudPoC/controller/checkins?user_id=1&place_id=1&longitude=2.9&latitude=8.9&device=Phone -> Creates a new checkin
+	Creates a new user with role User or Administrator:
 	
+		PUT http://localhost:8080/CrudPoC/controller/users?login=login&password=pass&role=[User|Administrator]
 	
-	POST PUT http://localhost:8080/CrudPoC/controller/users?id=1&login=login&password=pass&role=[User|Administrator] -> Updates an existing user
+	Creates a new place:
 	
-	POST http://localhost:8080/CrudPoC/controller/places?id=3&longitude=2.34&latitude=8.90&address=Almond Street -> Updates an existing place
+		PUT http://localhost:8080/CrudPoC/controller/places?longitude=2.34&latitude=8.90&address=Almond Street
 	
-	POST http://localhost:8080/CrudPoC/controller/checkins?id=2&user_id=1&place_id=1&longitude=2.9&latitude=8.9&device=Phone -> Updates an existing checkin
+	Creates a new checkin:
 	
+		PUT http://localhost:8080/CrudPoC/controller/checkins?user_id=1&place_id=1&longitude=2.9&latitude=8.9&device=Phone
 	
-	DELETE http://localhost:8080/CrudPoC/controller/users?id=1 -> Deletes an existing user
+	Updates an existing user:
 	
-	DELETE http://localhost:8080/CrudPoC/controller/places?id=1 -> Deletes an existing place
+		POST PUT http://localhost:8080/CrudPoC/controller/users?id=1&login=login&password=pass&role=[User|Administrator]
 	
-	DELETE http://localhost:8080/CrudPoC/controller/checkins?id=1 -> Deletes an existing checkin
+	Updates an existing place:
+	
+		POST http://localhost:8080/CrudPoC/controller/places?id=3&longitude=2.34&latitude=8.90&address=Almond Street
+	
+	Updates an existing checkin:
+	
+		POST http://localhost:8080/CrudPoC/controller/checkins?id=2&user_id=1&place_id=1&longitude=2.9&latitude=8.9&device=Phone
+	
+	Deletes an existing user:
+	
+		DELETE http://localhost:8080/CrudPoC/controller/users?id=1
+	
+	Deletes an existing place:
+	
+		DELETE http://localhost:8080/CrudPoC/controller/places?id=1
+	
+	Deletes an existing checkin:
+	
+		DELETE http://localhost:8080/CrudPoC/controller/checkins?id=1
