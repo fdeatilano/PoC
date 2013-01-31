@@ -14,7 +14,7 @@ import org.faf.view.views.Role;
 
 public class PermissionsManager {
 
-	public boolean allows(HttpServletRequest request, String action,
+	public boolean allows(Role role, String action,
 			String predicate) {
 		
 		if(Actions.GET.name().equals(action)){
@@ -22,14 +22,10 @@ public class PermissionsManager {
 				return true;
 			}
 		}
-		HttpSession session = request.getSession(false);
-		if(session==null){
+		if(role==null){
 			return false;
 		}else{
-			Role role = (Role)session.getAttribute(AppConfiguration.UsersFields.ROLE.name().toLowerCase());
-			if(role==null){
-				return false;
-			}else if(role.isAdmin()){
+			if(role.isAdmin()){
 				return true;
 			}else if(role.isUser()){
 				if(Actions.GET.equals(action)){

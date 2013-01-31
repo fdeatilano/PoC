@@ -114,7 +114,8 @@ public class CrudControllerTest {
 		Assert.assertEquals(deleteViewExpected.render(), actualDeleteView.render());
 		
 		View actualGetView = (Get) _crudController.get(checkIn);
-		View getViewExpected = new Get(null);
+		LinkedList<PersistenceEntity> emptyList = new LinkedList<PersistenceEntity>();
+		View getViewExpected = new Get(emptyList);
 		Assert.assertEquals(getViewExpected.render(), actualGetView.render());
 	}
 }

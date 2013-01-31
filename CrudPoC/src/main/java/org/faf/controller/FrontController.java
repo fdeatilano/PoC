@@ -31,7 +31,14 @@ public class FrontController extends HttpServlet{
 	@Override
 	protected void service(HttpServletRequest req, HttpServletResponse resp)
             throws ServletException, IOException {
-		if(_permManager.allows(req,req.getMethod(),getPredicate(req))){
+		HttpSession session = req.getSession(false);
+		Role role;
+		if(session==null){
+			role=null;
+		}else{
+			role=(Role)session.getAttribute(AppConfiguration.UsersFields.ROLE.name().toLowerCase());
+		}
+		if(_permManager.allows(role,req.getMethod(),getPredicate(req))){
 			super.service(req, resp);
 		}else{
 			PrintWriter out = resp.getWriter();
@@ -94,27 +101,29 @@ public class FrontController extends HttpServlet{
 		}
 	}
 	
-	private PersistenceEntity buildEntity(HttpServletRequest request) {
+	public PersistenceEntity buildEntity(HttpServletRequest request) {
 		PersistenceEntity entity = null;
+		LinkedHashMap<String,Object> values = new LinkedHashMap<String,Object>();
 		if(getPredicate(request).equals(AppConfiguration.Tables.USERS.name().toLowerCase())){
 			entity = new User();
 			for (UsersFields field : AppConfiguration.UsersFields.values()) {
-				Map<String,Object> values = new LinkedHashMap<String,Object>();
-				values.put(field.name(), request.getParameter(field.name()));
+				String param = request.getParameter(field.name().toLowerCase());
+				values.put(field.name(), param);
 			}
 		} else if(getPredicate(request).equals(AppConfiguration.Tables.PLACES.name().toLowerCase())){
 			entity = new Place();
 			for (PlacesFields field : AppConfiguration.PlacesFields.values()) {
-				Map<String,Object> values = new LinkedHashMap<String,Object>();
-				values.put(field.name(), request.getParameter(field.name()));
+				String param = request.getParameter(field.name().toLowerCase());
+				values.put(field.name(), param);
 			}
 		} else if(getPredicate(request).equals(AppConfiguration.Tables.CHECKINS.name().toLowerCase())){
 			entity = new CheckIn();
 			for (CheckinsFields field : AppConfiguration.CheckinsFields.values()) {
-				Map<String,Object> values = new LinkedHashMap<String,Object>();
-				values.put(field.name(), request.getParameter(field.name()));
+				String param = request.getParameter(field.name().toLowerCase());
+				values.put(field.name(), param);
 			}
 		}
+		entity.setValues(values);
 		return entity;
 	}
 

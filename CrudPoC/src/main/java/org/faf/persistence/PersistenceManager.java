@@ -171,9 +171,6 @@ public class PersistenceManager {
 				entities.add(actualEntity);
 			}
 			prepStmSelect.close();
-			if(entities.size()==0){
-				return null;
-			}
 			return entities;
 			
 		} catch (SQLException e) {
@@ -205,7 +202,7 @@ public class PersistenceManager {
 			WhereClause where = new WhereClause();
 			where.addCriteria(DB_IDENTIFIER_FIELD, identifier);
 			List<PersistenceEntity> entities = read(entityClass,where);
-			if(entities==null){
+			if(entities.size()==0){
 				return null;
 			}else{
 				return entities.get(0);
