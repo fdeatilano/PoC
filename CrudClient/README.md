@@ -1,7 +1,7 @@
-PoC
+CrudClient
 =======
 
-Proofs of concept developed as open source.
+Http Client application. It is able to mantain session using cookies and make GET, POST, PUT and DELETE http requests.
 
 Build and Install:
 ------------------------
@@ -11,7 +11,7 @@ Build and Install:
 - Open a command line tool and go to the CrudClient folder where the pom.xml file is located
 - Run the following command:
 
-	mvn clean assembly:assembly
+		mvn clean assembly:assembly
 	
 - A CrudClient.jar file will be generated in the foler CrudClient/target
 
@@ -22,7 +22,7 @@ Use Guide for CrudClient
 - Launch the application with java -jar CrudClient.jar
 - A prompt will display in this form:
 
-	http-query>
+		http-query>
 
 - To list all available commands enter ?list
 - To get detailed info on a command enter ?help command-name
