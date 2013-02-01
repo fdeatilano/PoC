@@ -1,7 +1,7 @@
-PoC
+CrudPoC
 =======
 
-Proofs of concept developed as open source.
+CRUD http Application
 
 Build and Install:
 ------------------------
@@ -11,7 +11,7 @@ Build and Install:
 - Open a command line tool and go to the CrudPoC folder where the pom.xml file is located
 - Run the following command:
 
-	mvn clean install
+		mvn clean install
 	
 - The application tests will be run and a CrudPoC.war file will be generated in the foler CrudPoC/target
 - Copy the CrudPoC.war file to the webapps folder of tomcat and start it.
