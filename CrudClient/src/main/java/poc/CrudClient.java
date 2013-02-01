@@ -17,6 +17,7 @@ import org.apache.http.protocol.BasicHttpContext;
 import org.apache.http.util.EntityUtils;
 
 import asg.cliche.Command;
+import asg.cliche.Param;
 import asg.cliche.ShellFactory;
 
 public class CrudClient 
@@ -41,14 +42,20 @@ public class CrudClient
 	
 
 	@Command
-	public String setHostnamePort(String hostname, String port){
+	public String setHostnamePort(
+			@Param(name="hostname", description="Hostname to connect to, by default localhost")
+			String hostname, 
+			@Param(name="port", description="Port used to connect to hostname, by default 8080")
+			String port){
 		_hostname=hostname;
 		_port=port;
 		return "Hostname set to: "+_hostname+"\nPort set to: "+_port;
 	}
 	
 	@Command
-    public String authenticate(String parameters) throws HttpException, IOException {
+    public String authenticate(
+    		@Param(name="parameters", description="parameters passed to the metod in the form field1=value&field2=value2")
+    		String parameters) throws HttpException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		HttpGet httpget = new HttpGet(getBasicAddress()+"authenticate?"+parameters); 
 		HttpResponse response = httpclient.execute(httpget, _localContext);
@@ -56,7 +63,11 @@ public class CrudClient
     }
 	
 	@Command
-    public String get(String entity, String parameters) throws HttpException, IOException {
+    public String get(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity,
+    		@Param(name="parameters", description="parameters passed to the metod in the form field1=value&field2=value2")
+    		String parameters) throws HttpException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		String strUrl = getBasicAddress()+entity;
 		if (parameters!=null) {
@@ -68,12 +79,18 @@ public class CrudClient
     }
 	
 	@Command
-    public String get(String entity) throws HttpException, IOException {
+    public String get(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity) throws HttpException, IOException {
 		return get(entity,null);
     }
 	
 	@Command
-    public String post(String entity, String parameters) throws HttpException, IOException {
+    public String post(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity,
+    		@Param(name="parameters", description="parameters passed to the metod in the form field1=value&field2=value2")
+    		String parameters) throws HttpException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		String strUrl = getBasicAddress()+entity;
 		if (parameters!=null) {
@@ -85,12 +102,18 @@ public class CrudClient
     }
 	
 	@Command
-    public String post(String entity) throws HttpException, IOException {
+    public String post(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity) throws HttpException, IOException {
 		return post(entity,null);
     }
 	
 	@Command
-    public String put(String entity, String parameters) throws HttpException, IOException {
+    public String put(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity, 
+    		@Param(name="parameters", description="parameters passed to the metod in the form field1=value&field2=value2")
+    		String parameters) throws HttpException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		String strUrl = getBasicAddress()+entity;
 		if (parameters!=null) {
@@ -102,12 +125,18 @@ public class CrudClient
     }
 	
 	@Command
-    public String put(String entity) throws HttpException, IOException {
+    public String put(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity) throws HttpException, IOException {
 		return put(entity,null);
     }
 	
 	@Command
-    public String delete(String entity, String parameters) throws HttpException, IOException {
+    public String delete(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity, 
+    		@Param(name="parameters", description="parameters passed to the metod in the form field1=value&field2=value2")
+    		String parameters) throws HttpException, IOException {
 		HttpClient httpclient = new DefaultHttpClient();
 		String strUrl = getBasicAddress()+entity;
 		if (parameters!=null) {
@@ -119,7 +148,9 @@ public class CrudClient
     }
 	
 	@Command
-    public String delete(String entity) throws HttpException, IOException {
+    public String delete(
+    		@Param(name="entity", description="this is the entity you are trying to manage. Valid values [authenticate|users|places|checkins]")
+    		String entity) throws HttpException, IOException {
 		return delete(entity,null);
     }
 

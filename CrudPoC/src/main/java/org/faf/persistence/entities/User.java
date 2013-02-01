@@ -70,14 +70,19 @@ public class User implements PersistenceEntity{
 	@Override
 	public void setValues(LinkedHashMap<String, Object> values) {
 		for (String field : values.keySet()) {
+			Object currentField = values.get(field);
 			if(field.equals(UsersFields.ID.name())){
-				id=(Integer)values.get(field);
+				if (currentField instanceof String) {
+					id=Integer.valueOf((String) currentField);
+				}else if(currentField instanceof Integer) {
+					id=(Integer)currentField;
+				}
 			} else if(field.equals(UsersFields.LOGIN.name())){
-				login=(String)values.get(field);
+				login=(String)currentField;
 			} else if(field.equals(UsersFields.PASSWORD.name())){
-				password=(String)values.get(field);
+				password=(String)currentField;
 			} else if(field.equals(UsersFields.ROLE.name())){
-				role=(String)values.get(field);
+				role=(String)currentField;
 			}
 		}
 	}

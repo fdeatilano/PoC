@@ -65,11 +65,11 @@ public class FrontController extends HttpServlet{
 			String login = request.getParameter(AppConfiguration.UsersFields.LOGIN.name().toLowerCase());
 			String password = request.getParameter(AppConfiguration.UsersFields.PASSWORD.name().toLowerCase());
 			Role role = (Role) controller.authenticate(login, password);
-			if(role!=null){
+			if(role.isValid()){
 				HttpSession session = request.getSession();
 				session.setAttribute(AppConfiguration.UsersFields.ROLE.name().toLowerCase(), role);
-				out.println(role.render());
 			}
+			out.println(role.render());
 		}else{
 			PersistenceEntity entity = buildEntity(request);
 			if(entity!=null){

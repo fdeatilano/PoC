@@ -22,16 +22,14 @@ public class PermissionsManager {
 				return true;
 			}
 		}
-		if(role==null){
-			return false;
-		}else{
+		if(role!=null && role.isValid()){
 			if(role.isAdmin()){
 				return true;
 			}else if(role.isUser()){
-				if(Actions.GET.equals(action)){
+				if(Actions.GET.name().equals(action)){
 					return true;
-				}else if(Actions.PUT.equals(action)){
-					if(CHECKINS.equals(predicate)){
+				}else if(Actions.PUT.name().equals(action)){
+					if(CHECKINS.name().toLowerCase().equals(predicate)){
 						return true;
 					}else{
 						return false;
@@ -42,6 +40,8 @@ public class PermissionsManager {
 			}else{
 				return false;
 			}
+		}else{
+			return false;
 		}
 	}
 

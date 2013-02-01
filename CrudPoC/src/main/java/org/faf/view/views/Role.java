@@ -13,7 +13,7 @@ public class Role implements View{
 	}
 
 	public Boolean isAdmin() {
-		if(role.equals(AppConfiguration.ROLE_ADMIN)){
+		if(AppConfiguration.ROLE_ADMIN.equals(role)){
 			return true;
 		}else{
 			return false;
@@ -21,7 +21,7 @@ public class Role implements View{
 	}
 	
 	public Boolean isUser() {
-		if(role.equals(AppConfiguration.ROLE_USER)){
+		if(AppConfiguration.ROLE_USER.equals(role)){
 			return true;
 		}else{
 			return false;
@@ -34,6 +34,14 @@ public class Role implements View{
 			return "Ups! There was an error, maybe you introduced an invalid user or password.\n Just try again!";
 		}else{
 			return "You are logged in now as "+role;
+		}
+	}
+
+	public boolean isValid() {
+		if(isAdmin()||isUser()){
+			return true;
+		}else{
+			return false;
 		}
 	}
 

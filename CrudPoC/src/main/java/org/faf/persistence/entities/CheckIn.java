@@ -98,26 +98,47 @@ public class CheckIn implements PersistenceEntity{
 	@Override
 	public void setValues(LinkedHashMap<String, Object> values) {
 		for (String field : values.keySet()) {
+			Object currentField = values.get(field);
 			if(field.equals(CheckinsFields.ID.name())){
-				id=(Integer)values.get(field);
+				if (currentField instanceof String) {
+					id=Integer.valueOf((String) currentField);
+				}else if(currentField instanceof Integer) {
+					id=(Integer)currentField;
+				}
 			} else if(field.equals(CheckinsFields.USER_ID.name())){
 				if(user==null){
 					user=new User();
 				}
-				user.setId((Integer)values.get(field));
+				if (currentField instanceof String) {
+					user.setId(Integer.valueOf((String) currentField));
+				}else if(currentField instanceof Integer) {
+					user.setId((Integer)currentField);
+				}
 			} else if(field.equals(CheckinsFields.PLACE_ID.name())){
 				if(place==null){
 					place=new Place();
+				} 
+				if (currentField instanceof String) {
+					place.setId(Integer.valueOf((String) currentField));
+				}else if(currentField instanceof Integer) {
+					place.setId((Integer)currentField);
 				}
-				place.setId((Integer)values.get(field));
 			}else if(field.equals(CheckinsFields.CHECK_TIME.name())){
-				checkTime=(Timestamp)values.get(field);
+				checkTime=(Timestamp)currentField;
 			} else if(field.equals(CheckinsFields.LONGITUDE.name())){
-				longitude=(Double)values.get(field);
+				if (currentField instanceof String) {
+					longitude=Double.valueOf((String) currentField);
+				}else if(currentField instanceof Double) {
+					longitude=(Double)currentField;					
+				}
 			} else if(field.equals(CheckinsFields.LATITUDE.name())){
-				latitude=(Double)values.get(field);
+				if (currentField instanceof String) {
+					latitude=Double.valueOf((String) currentField);
+				}else if(currentField instanceof Double) {
+					latitude=(Double)currentField;					
+				}
 			} else if(field.equals(CheckinsFields.DEVICE.name())){
-				device=(String)values.get(field);
+				device=(String)currentField;
 			}
 		}
 	}
@@ -189,10 +210,20 @@ public class CheckIn implements PersistenceEntity{
 		if (place == null) {
 			if (other.place != null)
 				return false;
+		} else if (other.place==null) {
+			return false;
+		} else if (place.getId()==null) {
+			if (other.place.getId()!=null) 
+				return false;
 		} else if (!place.getId().equals(other.place.getId()))
 			return false;
 		if (user == null) {
 			if (other.user != null)
+				return false;
+		} else if (other.user==null) {
+			return false;
+		} else if (user.getId()==null) {
+			if (other.user.getId()!=null) 
 				return false;
 		} else if (!user.getId().equals(other.user.getId()))
 			return false;

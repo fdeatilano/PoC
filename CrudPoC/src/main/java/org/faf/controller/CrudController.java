@@ -30,6 +30,12 @@ public class CrudController {
 		
 		WhereClause where = new WhereClause();
 		where.addCriteria(UsersFields.LOGIN.name(), login);
+		if(login==null){
+			login="";
+		}
+		if(password==null){
+			password="";
+		}
 		where.addCriteria(UsersFields.PASSWORD.name(), CryptographicUtils.convertToMD5(password));
 		if(where.isEmpty()){
 			return new Role(null);
@@ -37,7 +43,7 @@ public class CrudController {
 		User userStored;
 		try {
 			List<PersistenceEntity> entities = pm.read(User.class, where);
-			if(entities==null){
+			if(entities==null || entities.size()==0){
 				return new Role(null);
 			}else{
 				userStored = (User) entities.get(0);

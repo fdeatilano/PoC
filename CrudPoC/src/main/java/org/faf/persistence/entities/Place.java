@@ -71,14 +71,27 @@ public class Place implements PersistenceEntity{
 	@Override
 	public void setValues(LinkedHashMap<String, Object> values) {
 		for (String field : values.keySet()) {
+			Object currentField = values.get(field);
 			if(field.equals(PlacesFields.ID.name())){
-				id=(Integer)values.get(field);
+				if (currentField instanceof String) {
+					id=Integer.valueOf((String) currentField);
+				}else if(currentField instanceof Integer) {
+					id=(Integer)currentField;
+				}
 			} else if(field.equals(PlacesFields.LONGITUDE.name())){
-				longitude=(Double)values.get(field);
+				if (currentField instanceof String) {
+					longitude=Double.valueOf((String) currentField);
+				}else if(currentField instanceof Double) {
+					longitude=(Double)currentField;					
+				}
 			} else if(field.equals(PlacesFields.LATITUDE.name())){
-				latitude=(Double)values.get(field);
+				if (currentField instanceof String) {
+					latitude=Double.valueOf((String) currentField);
+				}else if(currentField instanceof Double) {
+					latitude=(Double)currentField;					
+				}
 			} else if(field.equals(PlacesFields.ADDRESS.name())){
-				address=(String)values.get(field);
+				address=(String)currentField;
 			}
 		}
 	}

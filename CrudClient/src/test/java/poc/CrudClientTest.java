@@ -1,14 +1,20 @@
 package poc;
 
-import junit.framework.Test;
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
 import junit.framework.TestCase;
-import junit.framework.TestSuite;
 
 /**
  * Unit test for simple App.
  */
 public class CrudClientTest 
     extends TestCase
-{
+{	
+	@Test
+	public void testGetUsers() throws Exception {
+		
+	}
     
 }
